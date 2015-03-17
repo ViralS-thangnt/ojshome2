@@ -1,0 +1,63 @@
+/*style.css*/
+/*This is my custom style*/
+.title-admin{
+	float: left;
+	font-size: 17px;
+	line-height: 50px;
+	text-align: center;
+	font-family: 'Kaushan Script', cursive;
+	font-weight: 500;
+	height: 50px;
+	display: block;
+	margin-left: 20px;
+	margin-right: auto;
+	color: white;
+}
+.search-bar-admin{
+	width: 270px;
+	float: right;
+	margin-right: 15px;
+	margin-top: 7px;
+	margin-bottom: 7px;
+}
+.text-form-large{
+	font-size: large;
+}
+.text-form-medium{
+	font-size: medium;
+}
+.text-form-small{
+	font-size: small;
+}
+.help-block-custom {
+	display: block;
+	margin-top: 1px;
+	margin-bottom: 1px;
+	color: #737373;
+}
+.padding-box{
+	padding-bottom: 25px;
+}
+.margin-box-input{
+	margin: 15px
+}
+.wrapper-frame-master{
+	min-height: 648px;
+}
+
+.error{
+	color: red;
+}
+/*.user-show{
+	float: right;
+}*/
+.alert{
+	margin-top:30px;
+}
+.ok{
+	color: black;
+}
+.center{
+	text-align: center;
+}
+
