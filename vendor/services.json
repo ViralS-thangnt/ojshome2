@@ -28,6 +28,9 @@
         "App\\Providers\\EventServiceProvider",
         "App\\Providers\\RouteServiceProvider",
         "App\\Providers\\BookServiceProvider",
+        "App\\Providers\\ManuscriptServiceProvider",
+        "App\\Providers\\UserServiceProvider",
+        "App\\Providers\\EditorManuscriptServiceProvider",
         "App\\Providers\\MacroServiceProvider",
         "App\\Providers\\HtmlServiceProvider",
         "Barryvdh\\Debugbar\\ServiceProvider"
@@ -50,6 +53,9 @@
         "App\\Providers\\EventServiceProvider",
         "App\\Providers\\RouteServiceProvider",
         "App\\Providers\\BookServiceProvider",
+        "App\\Providers\\ManuscriptServiceProvider",
+        "App\\Providers\\UserServiceProvider",
+        "App\\Providers\\EditorManuscriptServiceProvider",
         "App\\Providers\\MacroServiceProvider",
         "Barryvdh\\Debugbar\\ServiceProvider"
     ],

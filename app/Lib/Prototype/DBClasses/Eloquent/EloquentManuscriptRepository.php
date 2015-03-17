@@ -11,70 +11,97 @@ use Session;
 class EloquentManuscriptRepository extends AbstractEloquentRepository implements ManuscriptInterface
 {
 
-	public function __construct(Manuscript $model, Guard $auth)
-	{
-		$this->model = $model;
-		$this->auth = $auth;
-		$this->user = $this->auth->user();
-	}
 
-	public function formModify($data, $id = null)
-	{
-		if($id){
-			$manuscript = $this->model->find($id);
-		}
-		else 
-		{
-			$manuscript = $this->model;
-		}
-		
-		$data['author_id'] = $this->user->id;
-		$manuscript->fill($data);
+    public function __construct(Manuscript $model, Guard $auth)
+    {
+        $this->model = $model;
+        $this->auth = $auth;
+        $this->user = $this->auth->user();
+    }
 
-		if(Session::has('FILE_UPLOAD_SESSION'))
+    public function formModify($data, $id = null)
+    {
+        if ($id) {
+            $manuscript = $this->model->find($id);
+        } else {
+            $manuscript = $this->model;
+        }
+        
+        $data['author_id'] = $this->user->id;
+        $manuscript->fill($data);
 
-			$manuscript->file = Session::get('FILE_UPLOAD_SESSION');
+        if(Session::has('FILE_UPLOAD_SESSION'))
 
-		$manuscript->save();
-		
-		return $manuscript;
-	}
+            $manuscript->file = Session::get('FILE_UPLOAD_SESSION');
+        
+        $manuscript->save();
+        // dd($manuscript);
+        return $manuscript;
+    }
 
-	public function getById($id, array $with = array()){
+    public function getById($id, array $with = array()){
 
-		return $this->model->find($id);
-	}
-
+        return $this->model->find($id);
+    }
 
 	public function getByStatus($status = null){
 		switch ($status) {
-			case IN_REVIEW:
-				
+			case IN_REVIEW:				
 				$data = Manuscript::getDataInReview($this->user);
 				break;
 			case UNSUBMIT:
 				
 				break;
+			case M_REVIEWER:				
+				$data = Manuscript::getDataReviewed($this->user, $status);
+				break;
+			case PUBLISHED:
+				$data = Manuscript::getDataPublished($this->user, $status);
 			default:
 				$data = Manuscript::getDataPublished($this->user, $status);
 				break;
 		}
 
-		$data['data']->each(function ($manuscript) {
-			$manuscript->fullname = $manuscript->last_name .' '. $manuscript->first_name;
-			$manuscript->send_at = date("d/m/Y", strtotime($manuscript->send_at));
-			$manuscript->process = $manuscript->status;
-		});
+
 		// dd($data);
 		return $data;
 	}
 
-	public function uploadFile(){
-		if(doUploadDocument()){
-			
-			return $_FILES["file"]["name"] . '/' . basename($_FILES["file"]["name"]);
-		}
 
-		return '';
-	}
+    // public function getByStatus($status = IN_SCREENING)
+    // {
+    //     return  $this->model->with('editorManuscripts')->status(IN_SCREENING, $this->user->id)->get();
+
+    //     switch ($status) {
+    //         case IN_REVIEW:
+                
+    //             $data = Manuscript::getDataInReview($this->user);
+    //             break;
+    //         case UNSUBMIT:
+    //             $data = $this->model->status(IN_SCREENING, 2)->get();
+
+    //             return $data;
+    //             break;
+    //         default:
+    //             $data = Manuscript::getDataPublished($this->user, $status);
+    //             break;
+    //     }
+
+    //     $data['data']->each(function ($manuscript) {
+    //         $manuscript->fullname = $manuscript->last_name .' '. $manuscript->first_name;
+    //         $manuscript->send_at = date("d/m/Y", strtotime($manuscript->send_at));
+    //         $manuscript->process = $manuscript->status;
+    //     });
+    //     // dd($data);
+    //     return $data;
+    // }
+
+    public function uploadFile(){
+        if(doUploadDocument()){
+            
+            return $_FILES["file"]["name"] . '/' . basename($_FILES["file"]["name"]);
+        }
+
+        return '';
+    }
 }

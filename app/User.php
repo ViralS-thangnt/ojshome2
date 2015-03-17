@@ -34,19 +34,16 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
      */
     protected $hidden = ['password', 'remember_token'];
 
-    //define relationship
+
+    //Define User relationship
     public function manuscripts()
     {
-        return $this->hasMany('App\Manuscript','author_id');
+        return $this->hasMany('App\Manuscript', 'author_id');
     }
 
-    public function editorManuscript()
+
+    public function editorManuscripts()
     {
         return $this->hasMany('App\EditorManuscript');
     }
-
-
-    /*------------------define scope-----------------------*/
-
-
 }

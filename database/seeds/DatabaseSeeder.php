@@ -5,6 +5,7 @@ use Illuminate\Database\Eloquent\Model;
 //use DB;
 use App\User;
 use App\Manuscript;
+use App\EditorManuscript;
 
 class DatabaseSeeder extends Seeder
 {
@@ -37,6 +38,7 @@ class UserTableSeeder extends Seeder
                 'username'          =>  'admin',
                 'password'          =>  bcrypt('12345678'),
                 'email'             =>  'quandt@naida.bz',
+                'degree_id'         =>  1,
                 'actor_no'          =>  ADMIN,
               ]);
 
@@ -47,6 +49,7 @@ class UserTableSeeder extends Seeder
                 'password'          =>  bcrypt('12345678'),
                 'email'             =>  'author_demo@naida.bz',
                 'actor_no'          =>  AUTHOR,
+                'degree_id'         =>  1,
                 'last_name'         => 'last_name',
                 'first_name'        => 'first_name',
               ]);
@@ -58,6 +61,7 @@ class UserTableSeeder extends Seeder
                 'password'          =>  bcrypt('12345678'),
                 'email'             =>  'managing_editor@naida.bz',
                 'actor_no'          =>  MANAGING_EDITOR,
+                'degree_id'         =>  1,
                 'last_name'         => 'last_name',
                 'first_name'        => 'first_name',
               ]);
@@ -69,6 +73,7 @@ class UserTableSeeder extends Seeder
                 'password'          =>  bcrypt('12345678'),
                 'email'             =>  'screening_editor@naida.bz',
                 'actor_no'          =>  SCREENING_EDITOR,
+                'degree_id'         =>  1,
               ]);
 
         //Section Editor
@@ -78,6 +83,7 @@ class UserTableSeeder extends Seeder
                 'password'          =>  bcrypt('12345678'),
                 'email'             =>  'section_editor@naida.bz',
                 'actor_no'          =>  SECTION_EDITOR,
+                'degree_id'         =>  1,
               ]);
 
         //Reviewer
@@ -87,6 +93,7 @@ class UserTableSeeder extends Seeder
                 'password'          =>  bcrypt('12345678'),
                 'email'             =>  'reviewer@naida.bz',
                 'actor_no'          =>  REVIEWER,
+                'degree_id'         =>  1,
               ]);
 
       //Chief Editor
@@ -96,6 +103,7 @@ class UserTableSeeder extends Seeder
               'password'          =>  bcrypt('12345678'),
               'email'             =>  'chief@naida.bz',
               'actor_no'          =>  CHIEF_EDITOR,
+              'degree_id'         =>  1,
             ]);
 
       //Copy Editor
@@ -105,6 +113,7 @@ class UserTableSeeder extends Seeder
               'password'          =>  bcrypt('12345678'),
               'email'             =>  'copy_editor@naida.bz',
               'actor_no'          =>  COPY_EDITOR,
+              'degree_id'         =>  1,
             ]);
 
       //Layout Editor
@@ -114,6 +123,7 @@ class UserTableSeeder extends Seeder
               'password'          =>  bcrypt('12345678'),
               'email'             =>  'layout_editor@naida.bz',
               'actor_no'          =>  LAYOUT_EDITOR,
+              'degree_id'         =>  1,
             ]);
 
       //Production Editor
@@ -123,12 +133,14 @@ class UserTableSeeder extends Seeder
               'password'          =>  bcrypt('12345678'),
               'email'             =>  'production_editor@naida.bz',
               'actor_no'          =>  PRODUCTION_EDITOR,
+              'degree_id'         =>  1,
             ]);
 
       //Manuscripts
       DB::table('manuscripts')->delete();
 
       Manuscript::create([
+          'id'                    =>  1,
           'type'                  =>  A,
           'author_id'             =>  2,
           'name'                  =>  'Lorem ipsum dolor',
@@ -147,6 +159,7 @@ class UserTableSeeder extends Seeder
         ]);
 
       Manuscript::create([
+          'id'                    =>  2,
           'type'                  =>  B,
           'author_id'             =>  2,
           'name'                  =>  'Lorem ipsum dolor',
@@ -165,6 +178,7 @@ class UserTableSeeder extends Seeder
         ]);
 
       Manuscript::create([
+          'id'                    =>  3,
           'type'                  =>  C,
           'author_id'             =>  2,
           'name'                  =>  'Lorem ipsum dolor',
@@ -183,6 +197,7 @@ class UserTableSeeder extends Seeder
         ]);
 
       Manuscript::create([
+          'id'                    =>  4,
           'type'                  =>  D,
           'author_id'             =>  2,
           'name'                  =>  'Lorem ipsum dolor',
@@ -201,6 +216,7 @@ class UserTableSeeder extends Seeder
         ]);
 
       Manuscript::create([
+          'id'                    =>  5,
           'type'                  =>  E,
           'author_id'             =>  2,
           'name'                  =>  'Lorem ipsum dolor',
@@ -219,6 +235,7 @@ class UserTableSeeder extends Seeder
         ]);
       
       Manuscript::create([
+          'id'                    =>  6,
           'type'                  =>  A,
           'author_id'             =>  2,
           'name'                  =>  'Lorem ipsum dolor',
@@ -237,6 +254,7 @@ class UserTableSeeder extends Seeder
         ]);
 
       Manuscript::create([
+          'id'                    =>  7,
           'type'                  =>  B,
           'author_id'             =>  2,
           'name'                  =>  'Lorem ipsum dolor',
@@ -255,6 +273,7 @@ class UserTableSeeder extends Seeder
         ]);
 
       Manuscript::create([
+          'id'                    =>  8,
           'type'                  =>  C,
           'author_id'             =>  2,
           'name'                  =>  'Lorem ipsum dolor',
@@ -273,6 +292,7 @@ class UserTableSeeder extends Seeder
         ]);
 
       Manuscript::create([
+          'id'                    =>  9,
           'type'                  =>  D,
           'author_id'             =>  2,
           'name'                  =>  'Lorem ipsum dolor',
@@ -289,5 +309,135 @@ class UserTableSeeder extends Seeder
           'is_revise'             =>  0,
           'status'                =>  UNSUBMIT,
         ]);
+
+      Manuscript::create([
+          'id'                    =>  10,
+          'type'                  =>  A,
+          'author_id'             =>  2,
+          'editor_id'             =>  4,
+          'loop'                  =>  3,
+          'name'                  =>  'Lorem ipsum dolor',
+          'summary_vi'            =>  'sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco',
+          'keyword_vi'            =>  '',
+          'summary_en'            =>  'aboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur',
+          'topic'                 =>  'Excepteur sint',
+          'recommend'             =>  0,
+          'propose_reviewer'      =>  '',
+          'co_author'             =>  '',
+          'file'                  =>  'author_manuscript.docx',
+          'is_chief_review'       =>  0,
+          'chief_decide'          =>  0,
+          'is_revise'             =>  0,
+          'status'                =>  IN_SCREENING,
+        ]);
+      
+      Manuscript::create([
+          'id'                    =>  11,
+          'type'                  =>  A,
+          'author_id'             =>  2,
+          'editor_id'             =>  4,
+          'loop'                  =>  3,
+          'name'                  =>  'Lorem ipsum dolor',
+          'summary_vi'            =>  'sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco',
+          'keyword_vi'            =>  '',
+          'summary_en'            =>  'aboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur',
+          'topic'                 =>  'Excepteur sint',
+          'recommend'             =>  0,
+          'propose_reviewer'      =>  '',
+          'co_author'             =>  '',
+          'file'                  =>  'author_manuscript.docx',
+          'is_chief_review'       =>  0,
+          'chief_decide'          =>  0,
+          'is_revise'             =>  0,
+          'status'                =>  IN_SCREENING,
+        ]);
+      
+      Manuscript::create([
+          'id'                    =>  12,
+          'type'                  =>  A,
+          'author_id'             =>  2,
+          'editor_id'             =>  4,
+          'loop'                  =>  3,
+          'name'                  =>  'Lorem ipsum dolor',
+          'summary_vi'            =>  'sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco',
+          'keyword_vi'            =>  '',
+          'summary_en'            =>  'aboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur',
+          'topic'                 =>  'Excepteur sint',
+          'recommend'             =>  0,
+          'propose_reviewer'      =>  '',
+          'co_author'             =>  '',
+          'file'                  =>  'author_manuscript.docx',
+          'is_chief_review'       =>  0,
+          'chief_decide'          =>  0,
+          'is_revise'             =>  0,
+          'status'                =>  IN_SCREENING,
+        ]);
+
+      //Editor manuscripts
+      DB::table('editor_manuscripts')->delete();
+
+      EditorManuscript::create([
+          'manuscript_id'         => 10,
+          'user_id'               => 4,
+          'loop'                  => 1,
+          'comments'              => 'consectetur adipiscing elit, sed do eiusmod tempor incididunt',
+        ]);
+
+      EditorManuscript::create([
+          'manuscript_id'         => 10,
+          'user_id'               => 4,
+          'loop'                  => 2,
+          'comments'              => 'consectetur adipiscing elit, sed do eiusmod tempor incididunt',
+        ]);
+
+      EditorManuscript::create([
+          'manuscript_id'         => 10,
+          'user_id'               => 4,
+          'loop'                  => 3,
+          'comments'              => 'consectetur adipiscing elit, sed do eiusmod tempor incididunt',
+        ]);
+
+       EditorManuscript::create([
+          'manuscript_id'         => 11,
+          'user_id'               => 4,
+          'loop'                  => 1,
+          'comments'              => 'consectetur adipiscing elit, sed do eiusmod tempor incididunt',
+        ]);
+
+      EditorManuscript::create([
+          'manuscript_id'         => 11,
+          'user_id'               => 4,
+          'loop'                  => 2,
+          'comments'              => 'consectetur adipiscing elit, sed do eiusmod tempor incididunt',
+        ]);
+
+      EditorManuscript::create([
+          'manuscript_id'         => 11,
+          'user_id'               => 4,
+          'loop'                  => 3,
+          'comments'              => 'consectetur adipiscing elit, sed do eiusmod tempor incididunt',
+        ]);
+      
+      EditorManuscript::create([
+          'manuscript_id'         => 12,
+          'user_id'               => 4,
+          'loop'                  => 1,
+          'comments'              => 'consectetur adipiscing elit, sed do eiusmod tempor incididunt',
+        ]);
+
+      EditorManuscript::create([
+          'manuscript_id'         => 12,
+          'user_id'               => 4,
+          'loop'                  => 2,
+          'comments'              => 'consectetur adipiscing elit, sed do eiusmod tempor incididunt',
+        ]);
+
+      EditorManuscript::create([
+          'manuscript_id'         => 12,
+          'user_id'               => 4,
+          'loop'                  => 3,
+          'comments'              => 'consectetur adipiscing elit, sed do eiusmod tempor incididunt',
+        ]);
+
     }
 }

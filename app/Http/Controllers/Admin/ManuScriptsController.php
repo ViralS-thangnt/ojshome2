@@ -32,7 +32,7 @@ class ManuscriptsController extends Controller {
 										]);
 	}
 
-	public function inReview()
+	public function in_review()
 	{	
 		$result = $this->repo->getByStatus(IN_REVIEW);
 
@@ -43,6 +43,22 @@ class ManuscriptsController extends Controller {
 		$result = $this->repo->getByStatus(PUBLISHED);
 		return view('manuscripts.manuscript')->withResult($result);
 	}
+
+
+	public function withdrawn(){
+		
+		$result = $this->repo->getByStatus(WITHDRAWN);
+
+		return view('manuscripts.manuscript')->withResult($result);
+
+	}
+
+	public function reviewed()
+	{	
+		$result = $this->repo->getByStatus(M_REVIEWER);
+		return view('manuscripts.manuscript')->withResult($result);
+	}
+
 	/**
 	 * Show the form for editing the specified resource.
 	 *

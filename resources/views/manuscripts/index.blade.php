@@ -22,6 +22,7 @@
         <th>{{ trans('admin.manuscript.lastModified') }}</th>
         <th>{{ trans('admin.manuscript.name') }}</th>
         <th>{{ trans('admin.manuscript.author') }}</th>
+        <th>Screening editor</th>
         <th colspan="2">Operations</th>
     </tr>
 </thead>
@@ -34,6 +35,14 @@
         <td>{{$manuscript->updated_at}}</td>
         <td>{{$manuscript->name}}</td>
         <td>{{$manuscript->last_name.' '.$manuscript->middle_name.' '.$manuscript->first_name}}</td>
+        <td>
+            @foreach ($manuscript->editorManuscripts as $editorManuscript)
+            <h1>EditorManuscript</h1>
+            {{$editorManuscript}}
+            <h1>Editor</h1>
+            {{$editorManuscript->user}}
+            @endforeach
+        </td>
         @if (in_array(AUTHOR, $permissions))
         <td><a href="{!! url('admin/manuscript/form/'. $manuscript->id) !!}">{{trans('admin.edit')}}</a></td>
         <td><a class="delete" href="{!! url('admin/manuscript/'. $manuscript->id) !!}">{{trans('admin.delete')}}</a></td>

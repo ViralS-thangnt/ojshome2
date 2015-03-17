@@ -133,4 +133,18 @@ abstract class AbstractEloquentRepository
 
         return false;
     }
+
+    // public function __call($method, $parameters)
+    // {
+    //     if (in_array($method, array('increment', 'decrement')))
+    //     {
+    //         return call_user_func_array(array($this, $method), $parameters);
+    //     }
+
+    //     $query = $this->model->newQuery();
+
+    //     //dd($query);
+
+    //     return call_user_func_array(array($query, $method), $parameters);
+    // }
 }

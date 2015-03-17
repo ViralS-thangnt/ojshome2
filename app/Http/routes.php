@@ -37,8 +37,10 @@ Route::get(Constant::$author_per['admin.manuscript.create']. '/{id?}', ['as'  =>
 Route::post(Constant::$author_per['admin.manuscript.create']. '/{id?}', ['as' =>  'manuscript.update','uses'  =>  'Admin\ManuscriptsController@update']);
 Route::get(Constant::$author_per['admin.manuscript.unsubmit'],    ['uses' => 'Admin\ManuscriptsController@unsubmit']);
 Route::get(Constant::$author_per['admin.manuscript.inScreening'], ['uses' => 'Admin\ManuscriptsController@inScreening']);
-Route::get(Constant::$author_per['admin.manuscript.inReview'],    ['uses' => 'Admin\ManuscriptsController@inReview']);
+Route::get(Constant::$author_per['admin.manuscript.inReview'],    ['uses' => 'Admin\ManuscriptsController@in_review']);
 Route::get(Constant::$author_per['admin.manuscript.inEditing'],   ['uses' => 'Admin\ManuscriptsController@inEditing']);
 Route::get(Constant::$author_per['admin.manuscript.rejected'],    ['uses' => 'Admin\ManuscriptsController@rejected']);
 Route::get(Constant::$author_per['admin.manuscript.withdrawn'],   ['uses' => 'Admin\ManuscriptsController@withdrawn']);
 Route::get(Constant::$author_per['admin.manuscript.published'],   ['uses' => 'Admin\ManuscriptsController@published']);
+
+Route::get(Constant::$reviewer_per['admin.manuscript.reviewed'],  ['uses' => 'Admin\ManuscriptsController@reviewed']);

@@ -147,6 +147,11 @@ return [
 	'manuscript.create.submit'			=>	'Gửi bài',
 	'manuscript.create.save'			=>	'Lưu',
 
+	// manuscript - general
+	'manuscript.title'					=>	'Thông tin bản thảo',
+	'manuscript.header_title'			=>	'Chi tiết',
+	'manuscript.detail'					=>	'Chi tiết',
+	'manuscript.more_detail'			=>	'Xem thêm',
 
 	// manuscript - In review
 	'manuscript_in_review.title'		=>	"Thông tin các bản thảo đang bình duyệt",
@@ -191,6 +196,7 @@ return [
 	'round_decide_chief_editor'	=>	'Quyết định của tổng biên tập',
 	'round_decide_editor'		=>	'Quyết định của ban biên tập',
 
-	
+	// 
+
 
 ];

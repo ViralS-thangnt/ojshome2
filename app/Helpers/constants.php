@@ -49,6 +49,7 @@ define('IN_EDITING', 3);
 define('REJECTED', 4);
 define('WITHDRAWN', 5);
 define('PUBLISHED', 6);
+define('M_REVIEWER', 7);
 
 // Define box icon 
 define('ICON_PEOPLE', 'ion-ios7-people');

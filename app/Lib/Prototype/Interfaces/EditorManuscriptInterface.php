@@ -3,7 +3,7 @@ namespace App\Lib\Prototype\Interfaces;
 
 use App\Lib\Prototype\Interfaces\BaseIntreface;
 
-interface ManuscriptInterface extends BaseInterface
+interface EditorManuscriptInterface extends BaseInterface
 {
-    public function getByStatus($status);
+    
 }

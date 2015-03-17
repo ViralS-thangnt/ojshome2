@@ -9,40 +9,17 @@
 
 @stop
 
-<!-- Header Image -->
-@section('user-avatar-header')
-
-{!! Form::image_custom('img/avatar3.png', 'Your Image', IMAGE_CIRCLE) !!}
-
-@stop
-
 
 <!-- Navigation Link -->
 @section('navigation-link')
 	
-	 <!-- {!! Form::navigate_link(ICON_DOCUMENT_TEXT,
-								   ['Bản thảo', 'Bản thảo đang bình duyệt'],
-								   [ url('admin/'), url('admin/manuscript-in-review')]) !!} -->
-@stop
-
-
-<!-- Welcome user -->
-@section('avatar-user')
-
-	 {!! Form::image_custom('img/avatar3.png', 'User Image', IMAGE_CIRCLE) !!}
-
-@stop
-
-@section('user-welcome')
-
 @stop
 
 
 <!-- Page Title -->
 @section('title')
-	 Bản thảo đang bình duyệt
+	 {!! Lang::get('admin.manuscript.title') !!}
 	
-
 @stop
 
 <!-- Page Title Extra -->
@@ -71,7 +48,7 @@
 
 <div class="box">
 <div class="box-header">
-	 <h3 class="box-title">Thông tin các bản thảo</h3>
+	 <h3 class="box-title">{!! Lang::get('admin.manuscript.header_title') !!}</h3>
 </div><!-- /.box-header -->
 <div class="box-body table-responsive">
 	 <div id="table_data_wrapper" class="dataTables_wrapper form-inline" role="grid">
@@ -83,7 +60,7 @@
 				@foreach($result['col_header'] as $head)
 					 <th class="sorting_asc center" role="columnheader" tabindex="0" aria-controls="table_data" rowspan="1" colspan="1">{{$head}}</th>
 				@endforeach
-				<th rowspan="1" colspan="1" class="center">Chi tiết</th>
+				<th rowspan="1" colspan="1" class="center">{!! Lang::get('admin.manuscript.detail') !!}</th>
 			</tr>
 		</thead>
 
@@ -92,7 +69,7 @@
 				@foreach($result['col_header'] as $head)
 					 <th class="sorting_asc center" role="columnheader" tabindex="0" aria-controls="table_data" rowspan="1" colspan="1">{{$head}}</th>
 				@endforeach
-				<th rowspan="1" colspan="1" class="center">Chi tiết</th>
+				<th rowspan="1" colspan="1" class="center">{!! Lang::get('admin.manuscript.detail') !!}</th>
 			</tr>
 		</tfoot>
 		<tbody role="alert" aria-live="polite" aria-relevant="all">
@@ -105,7 +82,7 @@
 							<td class="center" > {{ empty($row->$col) ? '-' : $row->$col }} </td>
 					@endforeach
 					
-					<td class="center"><a href = "{{ url('admin/manuscript/form/' . $row->id) }}"> Xem thêm </a></td>
+					<td class="center"><a href = "{{ url(Constant::$author_per['admin.manuscript.create'] . '/' . $row->id) }}"> {!! Lang::get('admin.manuscript.more_detail') !!} </a></td>
 				</tr>
 
 			@endforeach

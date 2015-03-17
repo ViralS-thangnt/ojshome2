@@ -3,6 +3,7 @@
 use Illuminate\Contracts\Auth\Guard;
 use App\Lib\Prototype\Interfaces\UserInterface;
 use App\Lib\Prototype\BaseClasses\AbstractEloquentRepository;
+//use Illuminate\Database\Query\Builder as QueryBuilder;
 use App\User;
 use Session;
 use Constant;
