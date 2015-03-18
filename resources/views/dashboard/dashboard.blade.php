@@ -11,7 +11,7 @@ Journal Open Source
 <!-- Header Image -->
 @section('user-avatar-header')
 
-{!! Form::image_custom('img/avatar3.png', 'Your Image', IMAGE_CIRCLE) !!}
+{!! Form::image_custom(url('assets/img/avatar3.png'), 'Your Image', IMAGE_CIRCLE) !!}
 
 @stop
 
@@ -30,13 +30,8 @@ Journal Open Source
 <!-- Welcome user -->
 @section('avatar-user')
 
-	{!! Form::image_custom('img/avatar3.png', 'User Image', IMAGE_CIRCLE) !!}
+	{!! Form::image_custom(url('assets/img/avatar3.png'), 'User Image', IMAGE_CIRCLE) !!}
 
-@stop
-
-@section('user-welcome')
-	<p>Hello, Thang</p>
-	<a href="#"><i class="fa fa-circle text-success"></i> Online</a>
 @stop
 
 

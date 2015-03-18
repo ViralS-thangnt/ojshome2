@@ -74,6 +74,7 @@ return [
 	'manuscript.rejected' 		=>	'Bản thảo bị từ chối',
 	'manuscript.withdrawn' 		=>	'Bản thảo rút nộp',
 	'manuscript.published' 		=>	'Bản thảo xuất bản',
+	'admin.manuscript.all'		=>	'Tất cả bản thảo',
  
 	// manuscript - create
 	'manuscript.create.navigation.draft'	=>	'Bản thảo',

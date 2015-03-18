@@ -79,6 +79,7 @@ return [
 	'manuscript.rejected' 		=>	'Rejected Manuscript',
 	'manuscript.withdrawn' 		=>	'Withdrawn Manuscript',
 	'manuscript.published' 		=>	'Published Manuscript',
+	'admin.manuscript.all'		=>	'All Manuscripts',
 
 	//review
 	'manuscript.unReview'       =>  'Manuscript Waiting For Review',

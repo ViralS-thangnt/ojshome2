@@ -32,7 +32,14 @@ class ManuscriptsController extends Controller {
 										]);
 	}
 
-	public function in_review()
+	public function inScreening()
+	{
+		$result = $this->repo->getByStatus(IN_SCREENING);
+
+		return view('manuscripts.manuscript')->withResult($result);
+	}
+
+	public function inReview()
 	{	
 		$result = $this->repo->getByStatus(IN_REVIEW);
 

@@ -2,7 +2,7 @@
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use App\Lib\Prototype\DbClasses\Eloquent\EloquentUserRepository;
+use App\Lib\Prototype\DBClasses\Eloquent\EloquentUserRepository;
 
 use Illuminate\Http\Request;
 use Session;
@@ -20,20 +20,6 @@ class DashboardController extends Controller {
     public function index()
     {
         $permissions = $this->userRepo->getPermission();
-
-        $manuscripts = $this->userRepo->getManuscripts();
-
-        //$user = $this->userRepo->getAuthor();
-
-        // dd($user);
-
-         dd($manuscripts);
-
-
-        // foreach ($manuscripts as $manuscript) {
-        //     var_dump($manuscript); 
-        // }
-        
         return view('dashboard.dashboard')->with('permissions', $permissions);
     }
 

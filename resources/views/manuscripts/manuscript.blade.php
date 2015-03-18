@@ -10,12 +10,6 @@
 @stop
 
 
-<!-- Navigation Link -->
-@section('navigation-link')
-	
-@stop
-
-
 <!-- Page Title -->
 @section('title')
 	 {!! Lang::get('admin.manuscript.title') !!}

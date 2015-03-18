@@ -134,6 +134,16 @@ abstract class AbstractEloquentRepository
         return false;
     }
 
+    /**
+    * check if current user  has an actor permission
+    **/
+    public function hasPermission($actor_id)
+    {
+        $current_user_actor = $this->getPermission();
+
+        return in_array($actor_id, $current_user_actor);
+    }
+
     // public function __call($method, $parameters)
     // {
     //     if (in_array($method, array('increment', 'decrement')))

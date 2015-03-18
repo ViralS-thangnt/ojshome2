@@ -23,6 +23,6 @@ class EditorManuscript extends Model
 
     public function manuscript()
     {
-        return $this->belongsTo('App\Manuscript');
+        return $this->belongsTo('App\Manuscript', 'manuscript_id');
     }
 }

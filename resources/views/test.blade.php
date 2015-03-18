@@ -6,13 +6,6 @@ Main Page
 
 @stop
 
-<!-- Welcome user -->
-@section('user-welcome')
-    <p>Hello, Thang</p>
-    <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
-@stop
-
-
 <!-- Main content -->
 @section('content')
 	<h1> This is main content</h1>
@@ -27,12 +20,6 @@ Main Page
     <li class="active">Main Page</li>
 </ol>
 
-@stop
-
-<!-- Welcome user -->
-@section('user-welcome')
-	<p>Hello, Thang</p>
-	<a href="#"><i class="fa fa-circle text-success"></i> Online</a>
 @stop
 
 @section('custom-menu')

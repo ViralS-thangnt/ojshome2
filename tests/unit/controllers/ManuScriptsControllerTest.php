@@ -14,35 +14,28 @@ public function setUp()
 		$this->app->instance('App\Lib\Prototype\DBClasses\Eloquent\EloquentManuscriptRepository' , $this->mock);
 	}
 
-	public function tearDown()
+  	public function tearDown()
 	{
 		Mockery::close();
 	}
 
-	public function testShowManuscriptUnsubmit(){
+	public function testShowManuscriptInReview(){
 		// authenticate
 		$user = new User(['email' => 'toanthang1988@gmail.com']);
 		$this->be($user);
 
-		// Mock
-		$this->mock->shouldReceive('unsubmit')
+		$this->mock->shouldReceive('form')
 					->once();
-					// ->andReturn(array('manuscripts' => [], 'permissions' => ''));
+					// ->andReturn(array());
 
-		$response = $this->call('GET', 'manuscripts/index');
-		$this->assertTrue($response->isOk());
-
-
-		// $this->assertViewHas('manuscripts');
-		// $this->assertViewHas('permissions');
-
-
+		$this->call('get', '/admin');
+        $this->assertViewHas('/admin');
 
 	}
 
 
 	public function testCreateManuscript(){
-		
+
 
 	}
 }

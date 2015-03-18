@@ -17,14 +17,10 @@ class CreateManuscriptsTable extends Migration {
 
 			$table->increments('id');
 			$table->integer('author_id');
-<<<<<<< HEAD
 			$table->integer('editor_id');
 			$table->integer('section_editor_id');
-			$table->integer('loop');
-			$table->text('author_comments');
-=======
+			$table->integer('current_editor_manuscript_id')->nullable();
 			$table->text('author_comments')->nullable();
->>>>>>> a61e5668a3180565a8d4bd34fce5ebd154682b17
 			$table->tinyInteger('type');
 			$table->integer('expect_journal_id')->nullable();
 			$table->integer('publish_journal_id')->nullable();
@@ -44,19 +40,10 @@ class CreateManuscriptsTable extends Migration {
 			$table->boolean('is_print_out')->nullable();
 			$table->boolean('is_pre_public')->nullable();
 			$table->tinyInteger('status');
-<<<<<<< HEAD
-			$table->integer('num_public');
-			$table->integer('num_page');
-			$table->string('file_final');
-			$table->string('file_page');
-			$table->string('publish_pre_no');
-			$table->dateTime('send_at');
-=======
-			$table->integer('num_public')->nullable();
-			$table->integer('num_page')->nullable();
 			$table->string('file_final')->nullable();
+			$table->string('file_page')->nullable();
+			$table->string('publish_pre_no')->nullable();;
 			$table->dateTime('send_at')->nullable();
->>>>>>> a61e5668a3180565a8d4bd34fce5ebd154682b17
 			$table->timestamps();
 		});
 	}

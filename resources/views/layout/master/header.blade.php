@@ -1,7 +1,7 @@
 <!-- Header -->
 
 <header class="header">
-    <a href="index.html" class="logo">
+    <a href="{!! route('dashboard') !!}" class="logo">
         <!-- Add the class icon to your logo image or logo icon to add the margining -->
         Admin Page
     </a>

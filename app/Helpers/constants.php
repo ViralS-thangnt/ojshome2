@@ -21,7 +21,16 @@ define('CHIEF_EDITOR', 7);
 define('COPY_EDITOR', 8);
 define('LAYOUT_EDITOR', 9);
 define('PRODUCTION_EDITOR', 10);
-
+//define actor sortname
+define('AUTHOR_SN', 'au');
+define('MANAGING_EDITOR_SN', 'me');
+define('SCREENING_EDITOR_SN', 'sce');
+define('SECTION_EDITOR_SN', 'se');
+define('REVIEWER_SN', 'rv');
+define('CHIEF_EDITOR_SN', 'ce');
+define('COPY_EDITOR_SN', 'cpe');
+define('LAYOUT_EDITOR_SN', 'le');
+define('PRODUCTION_EDITOR_SN', 'pe');
 //define manuscript type
 define('A', 1);
 define('B', 2);
