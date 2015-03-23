@@ -99,10 +99,28 @@ function getMenuItem($permissions)
 					break;
 				case REVIEWER:
 					$html .= Form::menu_item('Reviewer', Constant::$reviewer_per);
-					break;          
+					break;  
+				case COPY_EDITOR:
+					$html .= Form::menu_item('Copy Editor', Constant::$copy_editor_per);
+					break;
+				case MANAGING_EDITOR:
+					$html .= Form::menu_item('Managing Editor', Constant::$managing_editor_per);
+					break;  
+				case SECTION_EDITOR:
+					$html .= Form::menu_item('Section Editor', Constant::$section_editor_per);  
+					break;
+				case LAYOUT_EDITOR:
+					$html .= Form::menu_item('Layout Editor', Constant::$layout_editor_per);
+					break;
 			}
 		}
 	}
 
 	return $html;
+}
+
+//get check icon
+function getCheckIcon($boolean)
+{
+	return $boolean ? '<i class="fa fa-check"></i>' : '-'; 
 }

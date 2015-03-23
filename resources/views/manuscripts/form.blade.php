@@ -12,7 +12,7 @@
 
 {!! Form::navigate_link(ICON_MENU_BOOK, [
 						trans('admin.manuscript.create.navigation.draft') => url('admin/'), 
-						trans('admin.manuscript.create.navigation.create') => url('admin/manuscript')]) !!}
+						trans('admin.manuscript.create.navigation.create') => url('admin/manuscript/form')]) !!}
 
 @stop
 
@@ -49,7 +49,7 @@
 
 			{!! Form::help_block(Lang::get('admin.manuscript.create.help.name')) !!}
 
-			{!! Form::textarea_custom('name', '', 5, Lang::get('admin.manuscript.create.placeholder.name'), 'form-control',
+			{!! Form::textarea_custom('name', null, 5, Lang::get('admin.manuscript.create.placeholder.name'), 'form-control',
 							['onkeyup' => 'countWords(this, 20, 1, "black", "red", "countTopicName")'] ) !!}
 
 			{!! Form::div_open('', 'countTopicName') !!}{!! Form::div_close() !!}
@@ -61,7 +61,7 @@
 
 			{!! Form::help_block(Lang::get('admin.manuscript.create.help.summary_vi')) !!}
 
-			{!! Form::textarea_custom('summary_vi', '', 5, Lang::get('admin.manuscript.create.placeholder.summary_vi'), 'form-control',
+			{!! Form::textarea_custom('summary_vi', null, 5, Lang::get('admin.manuscript.create.placeholder.summary_vi'), 'form-control',
 							['onkeyup' => 'countWords(this, 200, 150, "black", "red", "countSummaryVn")'] ) !!}
 			
 			{!! Form::div_open('', 'countSummaryVn') !!}{!! Form::div_close() !!}
@@ -84,7 +84,7 @@
 
 			{!! Form::help_block(Lang::get('admin.manuscript.create.help.summary_en')) !!}
 
-			{!! Form::textarea_custom('summary_en', '', 5, Lang::get('admin.manuscript.create.placeholder.summary_en'), 'form-control',
+			{!! Form::textarea_custom('summary_en', null, 5, Lang::get('admin.manuscript.create.placeholder.summary_en'), 'form-control',
 							['onkeyup' => 'countWords(this, 200, 150, "black", "red", "countSummaryEn")'] ) !!}
 			
 			{!! Form::div_open('', 'countSummaryEn') !!}{!! Form::div_close() !!}
@@ -203,8 +203,20 @@
 	<!-- box-body -->
 	{!! Form::div_open('box-body') !!}
 
-		{!! Form::textarea_custom('policy', null, 20, Lang::get('admin.manuscript.create.placeholder.policy') ) !!}
+		{!! Form::textarea_custom('policy', Lang::get('admin.manuscript.create.placeholder.policy_content'), 20, 
+						Lang::get('admin.manuscript.create.placeholder.policy'), 'form-control', 
+						['readonly' => ''] ) !!}
+			<script>
+			// function reset(){
+				var inp = $('policy')[0]; // select the input with proper selector
+				document.write(inp);
+				var default_value = inp.value;
 
+				inp.addEventListener("input", function () { 
+				    this.value = default_value;
+				}, false);
+			// }
+			</script>
 	{!! Form::div_close() !!}
 
 	{!! Form::div_open('box-body') !!}

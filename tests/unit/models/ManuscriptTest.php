@@ -34,8 +34,8 @@ class ManuscriptTest extends TestCase {
                 ];
 	}
 
-	public function testEditManuscript(){
+	// public function testEditManuscript(){
 
-	}
+	// }
 
 }

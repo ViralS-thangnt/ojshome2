@@ -72,15 +72,15 @@
 	<title>
 		@yield('title')
 	</title>
-	<body class="skin-blue">
+	<body class="skin-blue {{ empty($result['body-class']) ? null :$result['body-class']}} ">
 		@include('layout.master.header')
 
-		<!-- <div class="wrapper row-offcanvas row-offcanvas-left" style="min-height: 648px;"> -->
-		{!! Form::div_open('wrapper row-offcanvas row-offcanvas-left wrapper-frame-master') !!}
+		<div class="wrapper row-offcanvas row-offcanvas-left" style="min-height: 648px;">
+		
 			@include('layout.master.left')
 			@include('layout.master.right')
-		{!! Form::div_close() !!}
-
+		
+		</div>
 		@include('layout.master.footer')
 
 	</body>

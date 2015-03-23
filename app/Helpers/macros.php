@@ -126,28 +126,22 @@ Form::macro('menu_item', function ($menu_name = 'menu',
 							$icon_menu_class = ICON_MENU_SPEED_DIAL, 
 							$is_active = 0,
 							$menu_link = '#'
-							){
-	// dd($icon_menu_class);
+							)
+{
 	$total_items = count($childs);
-	if($total_items == 1 and $is_active == 0){
+	if($total_items == 0 and $is_active == 0){
 
 		return '<ul class="sidebar-menu">
 					<li>
-						<a>
-							<i class="fa ' . $icon_menu_class . '"></i> <span>' . $menu_name . '</span>
+						<a href="#">
+							<i class="fa ' . $icon_menu_class . '"></i>
+							<span>' . $menu_name . '</span>
 						</a>
 					</li>
 				</ul>';
-	} elseif ($total_items == 1 and $is_active == 1) {
-
-		return '<ul class="sidebar-menu">
-					<li class="active">
-						<a href="' . $menu_link . '">
-							<i class="fa ' . $icon_menu_class . '"></i> <span>' . $menu_name . '</span>
-						</a>
-					</li>
-				</ul>';
-	} else {
+	} 
+	else 
+	{
 		$result = '<ul class="sidebar-menu">';
 		$result = $result . '<li class="treeview">
 								<a href="#">
@@ -160,9 +154,9 @@ Form::macro('menu_item', function ($menu_name = 'menu',
 		foreach ($childs as $key => $value) {
 			$result = $result . '<li><a href="' . url($value) . '" style="margin-left: 10px;">
 										<i class="fa fa-angle-double-right"></i> '. trans($key) .'</a></li>';
-		}
-		
-		return $result . '</ul></li></ul>';
+	}
+	
+	return $result . '</ul></li></ul>';
 	}
 });
 

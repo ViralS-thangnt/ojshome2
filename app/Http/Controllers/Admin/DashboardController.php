@@ -2,7 +2,7 @@
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use App\Lib\Prototype\DBClasses\Eloquent\EloquentUserRepository;
+use App\Lib\Prototype\Interfaces\UserInterface;
 
 use Illuminate\Http\Request;
 use Session;
@@ -11,7 +11,7 @@ class DashboardController extends Controller {
 
     protected $userRepo;
 
-    public function __construct(EloquentUserRepository $userRepo)
+    public function __construct(UserInterface $userRepo)
     {
         $this->middleware('auth');
         $this->userRepo = $userRepo;

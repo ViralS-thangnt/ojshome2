@@ -31,6 +31,7 @@ Route::get('admin/user-dashboard', ['as'    =>  'dashboard.user',
 // Route::post('admin/setLocale', ['as'    =>  'admin.setLocale', 'uses'   =>  'Admin\DashboardController@setLocale']);
 Route::get('admin/setLocale', ['as'    =>  'admin.setLocale', 'uses'   =>  'Admin\DashboardController@setLocale']);
 
+
 //Manuscript Links
 Route::get(Constant::$url['manuscript.form'], ['as'  =>  'manuscript.form', 'uses'   =>  'Admin\ManuscriptsController@form']);
 Route::post(Constant::$url['manuscript.form'], ['as' =>  'manuscript.update','uses'  =>  'Admin\ManuscriptsController@update']);
@@ -42,4 +43,11 @@ Route::get(Constant::$url['rejected'],    ['uses' => 'Admin\ManuscriptsControlle
 Route::get(Constant::$url['withdrawn'],   ['uses' => 'Admin\ManuscriptsController@withdrawn']);
 Route::get(Constant::$url['published'],   ['uses' => 'Admin\ManuscriptsController@published']);
 Route::get(Constant::$url['reviewed'],  ['uses' => 'Admin\ManuscriptsController@reviewed']);
+Route::get(Constant::$url['wait-review'],  ['uses' => 'Admin\ManuscriptsController@waitReview']);
+Route::get(Constant::$url['rejected-review'], ['uses' => 'Admin\ManuscriptsController@rejectedReview']);
+Route::get(Constant::$url['all'],  ['uses' => 'Admin\ManuscriptsController@all']);
+Route::get(Constant::$url['report-rejected'],  ['uses' => 'Admin\ManuscriptsController@showReportRejected']);
+Route::get(Constant::$url['get_all'],  ['uses' => 'Admin\ManuscriptsController@getall']);
+Route::post(Constant::$url['get_all'],  ['uses' => 'Admin\ManuscriptsController@SoftDeletes']);
 
+Route::post(Constant::$url['report-rejected'], ['uses'	=>	'Admin\ManuscriptsController@showReportRejected']);

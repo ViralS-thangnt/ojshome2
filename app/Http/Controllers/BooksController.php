@@ -8,12 +8,12 @@ use Input;
 use Validator;
 use App\Lib\Prototype\DbClasses\Eloquent\EloquentBookRepository;
 use App\Book;
-
+use App\Lib\Prototype\Interfaces\BookInterface;
 class BooksController extends Controller {
 
 protected $bookRepo;
 
-    public function __construct(EloquentBookRepository $bookRepo)
+    public function __construct(BookInterface $bookRepo)
     {
         //$this->middleware('auth');
         $this->bookRepo = $bookRepo;

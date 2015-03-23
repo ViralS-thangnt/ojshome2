@@ -11,11 +11,10 @@ use Constant;
 
 class EloquentUserRepository extends AbstractEloquentRepository implements UserInterface
 {
-    public function __construct(User $model, Guard $auth)
+    public function __construct(User $model)
     {
         $this->model = $model;
-        $this->auth = $auth;
-        $this->user = $this->auth->user();
+        $this->user = \Auth::user();
     }
 
     public function formModify($data, $id = null)

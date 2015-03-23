@@ -2,7 +2,7 @@
 
 use App\Http\Requests\UserRequest;
 use App\Http\Controllers\Controller;
-use App\Lib\Prototype\DbClasses\Eloquent\EloquentUserRepository;
+use App\Lib\Prototype\Interfaces\UserInterface;
 use Illuminate\Support\Facades\Session;
 use Input;
 
@@ -12,7 +12,7 @@ class UsersController extends Controller
 {
     protected $userRepo;
 
-    public function __construct(EloquentUserRepository $userRepo)
+    public function __construct(UserInterface $userRepo)
     {
         Session::put(REQUIRE_PERMISSION, ADMIN);
         //$this->middleware('auth');

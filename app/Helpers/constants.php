@@ -59,6 +59,17 @@ define('REJECTED', 4);
 define('WITHDRAWN', 5);
 define('PUBLISHED', 6);
 define('M_REVIEWER', 7);
+define('WAIT_REVIEW', 8);	// Chờ phản biện
+define('REJECTED_REVIEW',10);	//khong nhan phan bien
+
+define('ALL', 9);			// Tất cả các bản thảo
+
+//define editor stage
+define('SCREENING', 1);
+define('REVIEWING', 2);
+define('EDITING', 3);
+define('PUBLISHING', 4);
+
 
 // Define box icon 
 define('ICON_PEOPLE', 'ion-ios7-people');
@@ -113,4 +124,10 @@ define('FILE_SIZE_MAX', 70000000);
 // File path final
 define('FILE_UPLOAD_SESSION', 'path_file_uploaded');
 
-//define col view
+//define decide
+// define('NULL', '-');
+// define('ACCEPT', 1);
+// define('ACCEPT', 1);
+// define('ACCEPT', 1);
+// define('ACCEPT', 1);
+

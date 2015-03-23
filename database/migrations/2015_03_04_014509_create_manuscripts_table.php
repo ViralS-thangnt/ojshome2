@@ -17,13 +17,15 @@ class CreateManuscriptsTable extends Migration {
 
 			$table->increments('id');
 			$table->integer('author_id');
-			$table->integer('editor_id');
-			$table->integer('section_editor_id');
+			$table->integer('editor_id')->nullable();
+			$table->integer('section_editor_id')->nullable();
+			$table->integer('layout_editor_id')->nullable();
 			$table->integer('current_editor_manuscript_id')->nullable();
 			$table->text('author_comments')->nullable();
 			$table->tinyInteger('type');
 			$table->integer('expect_journal_id')->nullable();
 			$table->integer('publish_journal_id')->nullable();
+			$table->integer('pre_journal_id')->nullable();
 			$table->string('name');
 			$table->text('summary_vi');
 			$table->string('keyword_vi');
@@ -42,8 +44,8 @@ class CreateManuscriptsTable extends Migration {
 			$table->tinyInteger('status');
 			$table->string('file_final')->nullable();
 			$table->string('file_page')->nullable();
-			$table->string('publish_pre_no')->nullable();;
 			$table->dateTime('send_at')->nullable();
+			$table->timestamp('deleted_at')->nullable();
 			$table->timestamps();
 		});
 	}

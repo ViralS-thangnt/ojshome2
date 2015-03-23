@@ -8,10 +8,9 @@ use Input;
 
 class EloquentEditorManuscriptRepository extends AbstractEloquentRepository implements EditorManuscriptInterface
 {
-    public function __construct(EditorManuscript $model, Guard $auth)
+    public function __construct(EditorManuscript $model)
     {
         $this->model = $model;
-        $this->auth = $auth;
-        $this->user = $this->auth->user();
+        $this->user = \Auth::user();
     }
 }

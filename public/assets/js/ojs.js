@@ -30,3 +30,14 @@ function countWords(val, max, min, colorok, colorerror, divname){
 		$('#' + divname).text('Số từ có thể nhập thêm: ' + (max - len) + ' từ').css({'color' : colorok});
 	}
 }
+
+function resetText(idControl){
+	
+	var inp = $(idControl)[0]; // select the input with proper selector
+	alert(idControl);
+	var default_value = inp.value;
+
+	inp.addEventListener("input", function () { 
+		this.value = default_value;
+	}, false);
+}

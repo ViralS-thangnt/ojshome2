@@ -23,7 +23,10 @@
 
 @stop
 
-
+<!-- Left column -->
+@section('left-column')
+{!! getMenuItem($permissions) !!} 
+@stop
 
 @section('content')
 	
@@ -52,16 +55,16 @@
 		<thead>
 			<tr role="row">
 				@foreach($result['col_header'] as $head)
-					 <th class="sorting_asc center" role="columnheader" tabindex="0" aria-controls="table_data" rowspan="1" colspan="1">{{$head}}</th>
+					 <th class="sorting_asc center" role="columnheader" tabindex="0" aria-controls="table_data" rowspan="1" colspan="1">{{trans($head)}}</th>
 				@endforeach
-				<th rowspan="1" colspan="1" class="center">{!! Lang::get('admin.manuscript.detail') !!}</th>
+				<th rowspan="1" colspan="1" class="center">{!! trans('admin.manuscript.detail') !!}</th>
 			</tr>
 		</thead>
 
 		<tfoot>
 			<tr>
 				@foreach($result['col_header'] as $head)
-					 <th class="sorting_asc center" role="columnheader" tabindex="0" aria-controls="table_data" rowspan="1" colspan="1">{{$head}}</th>
+					 <th class="sorting_asc center" role="columnheader" tabindex="0" aria-controls="table_data" rowspan="1" colspan="1">{{trans($head)}}</th>
 				@endforeach
 				<th rowspan="1" colspan="1" class="center">{!! Lang::get('admin.manuscript.detail') !!}</th>
 			</tr>
@@ -73,7 +76,7 @@
 				<tr class="{{ ($is_odd) ? 'odd' : 'even' }}">
 
 					@foreach( $result['col_db'] as $col)						
-							<td class="center" > {{ empty($row->$col) ? '-' : $row->$col }} </td>
+							<td class="center" > {!! empty($row->$col) ? '-' : $row->$col !!} </td>
 					@endforeach
 					
 					<td class="center"><a href = "{{ url(Constant::$author_per['admin.manuscript.create'] . '/' . $row->id) }}"> {!! Lang::get('admin.manuscript.more_detail') !!} </a></td>
