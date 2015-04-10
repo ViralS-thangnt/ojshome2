@@ -44,9 +44,9 @@
     <div class="box-body">
         <h4>Thông tin của biên tập viên chế bản chịu trách nhiệm chỉnh sửa bản thảo này:</h4>
         @if($layout_editor)
-            Tên: {{$layout_editor->last_name . '  ' . $layout_editor->middle_name . '  ' . $layout_editor->first_name}}</br>
-            Email: {{$layout_editor->email}}</br>
-            Phone: {{$layout_editor->phone}}
+            Tên: <pre>{{$layout_editor->last_name . '  ' . $layout_editor->middle_name . '  ' . $layout_editor->first_name}}</pre></br>
+            Email: <pre>{{$layout_editor->email}}</pre></br>
+            Phone: <pre>{{$layout_editor->phone}}</pre>
 
         @else
 

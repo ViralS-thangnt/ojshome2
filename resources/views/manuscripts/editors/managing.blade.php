@@ -6,6 +6,19 @@
 @parent
 @stop
 
+<script>
+    $(document).ready(function(){
+        $("form").submit(function(event){
+            // alert(document.getElementById("file").value);
+            if(!confirm('Bạn có chắc chắn muốn gửi bài ? '))
+            {
+                
+                event.preventDefault();
+            }
+        });
+    });
+</script>
+
 {!! Form::model($manuscript->editorManuscript, ['route' => ['editor.manuscript.update', $manuscript->id, $editorManuscript_id], 'id' => 'form-editor-manuscript', 'enctype' => 'multipart/form-data']) !!}
 
 
@@ -17,11 +30,11 @@
 
         @if(isset($screening_editors_info) and $screening_editors_info)
             
-            Tên: {{$screening_editors_info['name']}}</br>
+            Tên: <pre>{{$screening_editors_info['name']}}</pre></br>
 
-            Vòng: {{isset($screening_editors_info['loop']) ? $screening_editors_info['loop'] : '----'}}</br>
+            Vòng: <pre>{{isset($screening_editors_info['loop']) ? $screening_editors_info['loop'] : '----'}}</pre></br>
             
-            Bình luận: {{isset($screening_editors_info['comments']) ? $screening_editors_info['comments'] : '----'}}</br>
+            Bình luận: <pre>{{isset($screening_editors_info['comments']) ? $screening_editors_info['comments'] : '----'}}</pre></br>
         @else
             Không có thông tin của biên tập viên sơ loại
         @endif

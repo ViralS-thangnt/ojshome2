@@ -234,8 +234,6 @@ class EloquentManuscriptRepository extends AbstractEloquentRepository implements
             return $data;
         }
 
-
-
         if ($this->hasPermission(MANAGING_EDITOR)) 
         {
             //get list invite reviewers
@@ -262,68 +260,91 @@ class EloquentManuscriptRepository extends AbstractEloquentRepository implements
         $data['stage'] = getStageByStatus($data['manuscript']->status);
         $data['current_id'] = makeCurrentId($manuscript_id, $data['stage'], $data['loop']);  
 
-        if ($data['manuscript']->status == IN_SCREENING) 
-        {
-            if ($this->hasPermission(MANAGING_EDITOR)) 
-            {
-                $data['screening_editors'] = $this->user_repo->getListIds(SCREENING_EDITOR);
-                // Get info screening editors by manuscript id and stage = IN_SCREENING
-                $data['screening_editors_info'] = $this->getScreeningEditorByManuscriptAndStage($data['manuscript']->id, SCREENING);
-            }
-            else if($this->hasPermission(SCREENING_EDITOR))
-            {
-                //screening editor
-                $data['reviewers'] = $this->user_repo->getListIds(REVIEWER);
-            }
-        }
-// dd($data);
-        if ($data['manuscript']->status == IN_REVIEW) 
-        {
-                     
-            if ($this->hasPermission(MANAGING_EDITOR)) 
-            {
-                $data['section_editors'] = $this->user_repo->getListIds(SECTION_EDITOR);
-                $data['reviewers'] = $this->user_repo->getListIds(REVIEWER);
+        switch ($data['manuscript']->status) {
+            case IN_SCREENING:
+                $data = $this->getDataForInScreening($data);
+                break;
 
-                // Get info screening editors by manuscript id and stage = IN_SCREENING
-                $data['screening_editors_info'] = $this->getScreeningEditorByManuscriptAndStage($data['manuscript']->id, SCREENING);
+            case IN_REVIEW:
+                $data = $this->getDataForInReview($data, $manuscript_id);
+                break;
+
+            case IN_EDITING:
+                $data = $this->getDataForInEditing($data);
+                break;
+            default:
                 
-            } 
-            else if($this->hasPermission(SECTION_EDITOR))
-            {
-
-                // section editor
-                $temp = $this->getReviewerEditorAndCommentsById($manuscript_id, \Auth::user());
-                $data['reviewers_comments'] = $temp['reviewer'];
-                $data['section_editor_comments'] = $temp['section_editor'];
-
-            }
+                break;
         }
 
-        if ($data['manuscript']->status == IN_EDITING) 
+        return $data;
+    }
+
+    public function getDataForInScreening($data)
+    {
+        if ($this->hasPermission(MANAGING_EDITOR)) 
         {
-            if ($this->hasPermission(COPY_EDITOR)) 
-            {
-                // dd('saj');
-                $data = $this->getDataForCopyEditorInEditing($data);
-            }
-            else if ($this->hasPermission(SECTION_EDITOR)) 
-            {
+            $data['screening_editors'] = $this->user_repo->getListIds(SCREENING_EDITOR);
+            // Get info screening editors by manuscript id and stage = IN_SCREENING
+            $data['screening_editors_info'] = $this->getScreeningEditorByManuscriptAndStage($data['manuscript']->id, SCREENING);
+        }
+        else if($this->hasPermission(SCREENING_EDITOR))
+        {
+            //screening editor
+            $data['reviewers'] = $this->user_repo->getListIds(REVIEWER);
+        }
 
-            } 
-            else if ($this->hasPermission(MANAGING_EDITOR)) 
-            {
+        return $data;
+    }
 
-            } 
-            else if ($this->hasPermission(AUTHOR)) 
-            {
+    public function getDataForInReview($data, $manuscript_id)
+    {
+        if ($this->hasPermission(MANAGING_EDITOR)) 
+        {
+            // dd($data);
+            $data['section_editors'] = $this->user_repo->getListIds(SECTION_EDITOR);
+            $data['reviewers'] = $this->user_repo->getListIds(REVIEWER);
 
-            }
-            else if ($this->hasPermission(LAYOUT_EDITOR)) 
-            {
-                $data = $this->getDataForLayoutEditorInEditing($data);
-            }
+            // Get info screening editors by manuscript id and stage = IN_SCREENING
+            $data['screening_editors_info'] = $this->getScreeningEditorByManuscriptAndStage($data['manuscript']->id, SCREENING);
+            
+        } 
+        else if($this->hasPermission(SECTION_EDITOR))
+        {
 
+            // section editor
+            $temp = $this->getReviewerEditorAndCommentsById($manuscript_id, \Auth::user());
+            $data['reviewers_comments'] = $temp['reviewer'];
+            $data['section_editor_comments'] = $temp['section_editor'];
+
+        }
+
+        return $data;
+    }
+
+    public function getDataForInEditing($data)
+    {
+        // Get data for IN_EDITING status
+        if ($this->hasPermission(COPY_EDITOR)) 
+        {
+            // dd('saj');
+            $data = $this->getDataForCopyEditorInEditing($data);
+        }
+        else if ($this->hasPermission(SECTION_EDITOR)) 
+        {
+
+        } 
+        else if ($this->hasPermission(MANAGING_EDITOR)) 
+        {
+
+        } 
+        else if ($this->hasPermission(AUTHOR)) 
+        {
+
+        }
+        else if ($this->hasPermission(LAYOUT_EDITOR)) 
+        {
+            $data = $this->getDataForLayoutEditorInEditing($data);
         }
 
         return $data;
@@ -404,6 +425,7 @@ class EloquentManuscriptRepository extends AbstractEloquentRepository implements
                                 ->get()
                                 ;
                                 // dump($editor_manu);
+                                // dd($editor_manu);
         $data = array();
         if($editor_manu)
         {
@@ -425,7 +447,9 @@ class EloquentManuscriptRepository extends AbstractEloquentRepository implements
     // Get list reviewer and reviewer's comments
     public function getReviewerEditorAndCommentsById($manuscript_id, $section_editor)
     {
-        $reviewer = EditorManuscript::with('user');
+        $reviewer = EditorManuscript::with('user')
+                                    ->where('manuscript_id', $manuscript_id)
+                                    ;
         $data = array();
         foreach ($reviewer->get() as $value) {
             // dump($value);

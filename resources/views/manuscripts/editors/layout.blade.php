@@ -39,19 +39,6 @@
 
     function downloadFile()
     {
-        // alert(document.getElementById("is_print_out"));
-        // var temp = "";
-        
-        // if (document.getElementById("is_print_out") != null) {
-        //     // not pre public
-        //     alert('temp : not pre public' + temp);
-        //     temp = "{{$temp = $layout_editor_file_id}}";
-
-        // } else {
-        //     // pre public
-        //     alert('temp : pre public' + temp);
-        // }
-        // // alert('' + temp);
         if( confirm('Bạn muốn tải xuống file bản thảo ?'))
         {
             window.open("{!! url(Constant::$url['download-file'] ) . '/' . $layout_editor_file_id !!}", "download");
@@ -74,9 +61,9 @@
     <div class="box-body">
         
         <h4>Thông tin của biên tập viên bản thảo chịu trách nhiệm cho bản thảo này:</h4>
-        Tên: {{$copy_editor->last_name . '  ' . $copy_editor->middle_name . '  ' . $copy_editor->first_name}}</br>
-        Email: {{$copy_editor->email}}</br>
-        Phone: {{$copy_editor->phone}}
+        Tên: <pre>{{$copy_editor->last_name . '  ' . $copy_editor->middle_name . '  ' . $copy_editor->first_name}}</pre></br>
+        Email: <pre>{{$copy_editor->email}}</pre></br>
+        Phone: <pre>{{$copy_editor->phone}}</pre>
         
     </div>  <!-- end box-body -->
 </div>  <!-- end box-primary -->

@@ -6,7 +6,18 @@
 @parent
 @stop
 
-
+<script>
+    $(document).ready(function(){
+        $("form").submit(function(event){
+            // alert(document.getElementById("file").value);
+            if(!confirm('Bạn có chắc chắn muốn gửi bài ? '))
+            {
+                
+                event.preventDefault();
+            }
+        });
+    });
+</script>
 
 {!! Form::model($manuscript->editorManuscript, ['method' => 'POST', 'route' => ['editor.manuscript.update-editor', $manuscript->id, $editorManuscript_id], 'id' => 'form-editor-manuscript', 'enctype' => 'multipart/form-data']) !!}
 
@@ -19,8 +30,8 @@
     <div class="box-body">
         <h4>Các nhận xét của nhà phản biện</h4>
         @foreach($reviewers_comments as $value)
-            <h4>Nhà phản biện: {{$value['name']}}</h4>
-            <h5>Bình luận: {{$value['comments']}}</h5><br />
+            <h4>Nhà phản biện: <pre>{{$value['name']}}</pre></h4>
+            <h5>Bình luận: <pre>{{$value['comments']}}</pre></h5><br />
         @endforeach
 
     </div>  <!-- end box-body -->

@@ -182,7 +182,7 @@ define('PRINT_OUT', 1);
 define('NOT_PRINT_OUT', 0);
 
 // file type
-define('FILE_TYPE_PRINT_OUT', 0);
+define('FILE_TYPE_PRINT_OUT', 'application/pdf');
 
 // Trong giai đoạn kiểm bông hay không
 define('PRE_PUBLIC', 1);
