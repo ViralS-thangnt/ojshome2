@@ -3,7 +3,6 @@
 
 
 
-
 #### *public static* magicMethods#### *public static* atLeastOnce($params = null) 
 
 Checks if a method has been invoked at least one
@@ -24,6 +23,8 @@ $user->getName();
  * `return`  StubMarshaler
 
 [See source](https://github.com/Codeception/Codeception/blob/2.0/src/Codeception/Util/Stub.php#L619)
+
+
 
 #### *public static* consecutive() 
 
@@ -65,7 +66,7 @@ Stub::construct(new User, array('autosave' => false), array('name' => 'davert));
 ?>
 ```
 
-To replace method provide it's name as a key in third parameter and it's return value or callback function as parameter
+To replace method provide it's name as a key in second parameter and it's return value or callback function as parameter
 
 ``` php
 <?php
@@ -105,7 +106,7 @@ Stub::constructEmpty(new User, array('autosave' => false), array('name' => 'dave
 ?>
 ```
 
-To replace method provide it's name as a key in third parameter and it's return value or callback function as parameter
+To replace method provide it's name as a key in second parameter and it's return value or callback function as parameter
 
 ``` php
 <?php
@@ -145,7 +146,7 @@ Stub::constructEmptyExcept(new User, 'save', array('autosave' => false), array('
 ?>
 ```
 
-To replace method provide it's name as a key in third parameter and it's return value or callback function as parameter
+To replace method provide it's name as a key in second parameter and it's return value or callback function as parameter
 
 ``` php
 <?php
@@ -175,6 +176,7 @@ Clones an object and redefines it's properties (even protected and private)
 
 [See source](https://github.com/Codeception/Codeception/blob/2.0/src/Codeception/Util/Stub.php#L221)
 
+
 #### *public static* exactly($count, $params = null) 
 
 Checks if a method has been invoked a certain amount
@@ -200,6 +202,7 @@ $user->getName();
 
 [See source](https://github.com/Codeception/Codeception/blob/2.0/src/Codeception/Util/Stub.php#L649)
 
+
 #### *public static* factory($class, $num = null, $params = null) 
 
 Creates $num instances of class through `Stub::make`.
@@ -211,6 +214,10 @@ Creates $num instances of class through `Stub::make`.
  * `return`  array
 
 [See source](https://github.com/Codeception/Codeception/blob/2.0/src/Codeception/Util/Stub.php#L77)
+
+
+
+
 
 #### *public static* make($class, $params = null, $testCase = null) 
 
@@ -383,5 +390,4 @@ Replaces properties and methods of current stub
  * `throws`  \LogicException
 
 [See source](https://github.com/Codeception/Codeception/blob/2.0/src/Codeception/Util/Stub.php#L464)
-
 <p>&nbsp;</p><div class="alert alert-warning">Reference is taken from the source code. <a href="https://github.com/Codeception/Codeception/blob/2.0/src/Codeception/Util/Stub.php">Help us to improve documentation. Edit module reference</a></div>

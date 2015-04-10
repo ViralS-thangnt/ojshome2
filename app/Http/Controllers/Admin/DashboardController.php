@@ -19,16 +19,13 @@ class DashboardController extends Controller {
 
     public function index()
     {
-        $permissions = $this->userRepo->getPermission();
-        return view('dashboard.dashboard')->with('permissions', $permissions);
+        return view('dashboard.dashboard');
     }
 
     
     public function userDashboard()
     {
-        $permissions = $this->userRepo->getPermission();
-
-        return view('dashboard.user-dashboard')->with('permissions', $permissions);
+        return view('dashboard.user-dashboard');
     }
 
     public function setLocale() {

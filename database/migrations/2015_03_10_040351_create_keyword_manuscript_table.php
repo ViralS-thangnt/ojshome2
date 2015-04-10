@@ -17,6 +17,7 @@ class CreateKeywordManuscriptTable extends Migration {
 			$table->increments('id');
 			$table->integer('manuscript_id');
 			$table->integer('keyword_id');
+			// $table->timestamp('deleted_at')->nullable();
 			$table->timestamps();
 		});
 	}

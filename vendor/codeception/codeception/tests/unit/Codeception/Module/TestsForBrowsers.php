@@ -24,8 +24,10 @@ abstract class TestsForBrowsers extends TestsForWeb
 
     public function testOpenAbsoluteUrls()
     {
-        $this->module->amOnUrl('http://localhost:8000/');
-        $this->module->see('Welcome to test app!', 'h1');
+        $this->module->amOnUrl('http://codeception.com/');
+        $this->module->see('Install');
+        $this->module->amOnPage('/quickstart');
+        $this->module->see('Quickstart', 'h1');
     }
 
     function testHeadersRedirect()

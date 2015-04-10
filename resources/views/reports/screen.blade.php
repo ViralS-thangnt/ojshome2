@@ -1,0 +1,1 @@
+{{ empty($screen) ? '0' : e($screen) }}

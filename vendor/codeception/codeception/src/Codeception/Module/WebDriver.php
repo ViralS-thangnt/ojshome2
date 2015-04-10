@@ -281,56 +281,43 @@ class WebDriver extends \Codeception\Module implements WebInterface, RemoteInter
         $this->webDriver->manage()->window()->setSize(new \WebDriverDimension($width, $height));
     }
 
-    public function seeCookie($cookie, array $params = [])
+    public function seeCookie($cookie)
     {
-        $cookies = $this->filterCookies($this->webDriver->manage()->getCookies(), $params);
-        $cookies = array_map(function ($c) { return $c['name']; }, $cookies);
+        $cookies = $this->webDriver->manage()->getCookies();
+        $cookies = array_map(
+            function ($c) {
+                return $c['name'];
+            },
+            $cookies
+        );
         $this->debugSection('Cookies', json_encode($this->webDriver->manage()->getCookies()));
         $this->assertContains($cookie, $cookies);
     }
 
-    public function dontSeeCookie($cookie, array $params = [])
+    public function dontSeeCookie($cookie)
     {
-        $cookies = $this->filterCookies($this->webDriver->manage()->getCookies(), $params);
-        $cookies = array_map(function ($c) { return $c['name']; }, $cookies);
         $this->debugSection('Cookies', json_encode($this->webDriver->manage()->getCookies()));
-        $this->assertNotContains($cookie, $cookies);
+        $this->assertNull($this->webDriver->manage()->getCookieNamed($cookie));
     }
 
-    public function setCookie($cookie, $value, array $params = [])
+    public function setCookie($cookie, $value)
     {
-        $params['name'] = $cookie;
-        $params['value'] = $value;
-        $this->webDriver->manage()->addCookie($params);
+        $this->webDriver->manage()->addCookie(array('name' => $cookie, 'value' => $value));
         $this->debugSection('Cookies', json_encode($this->webDriver->manage()->getCookies()));
     }
 
-    public function resetCookie($cookie, array $params = [])
+    public function resetCookie($cookie)
     {
         $this->webDriver->manage()->deleteCookieNamed($cookie);
         $this->debugSection('Cookies', json_encode($this->webDriver->manage()->getCookies()));
     }
 
-    public function grabCookie($cookie, array $params = [])
+    public function grabCookie($cookie)
     {
-        $params['name'] = $cookie;
-        $cookies = $this->filterCookies($this->webDriver->manage()->getCookies(), $params);
-        if (empty($cookies)) {
-            return null;
+        $value = $this->webDriver->manage()->getCookieNamed($cookie);
+        if (is_array($value)) {
+            return $value['value'];
         }
-        $cookie = reset($cookies);
-        return $cookie['value'];
-    }
-
-    protected function filterCookies($cookies, $params = [])
-    {
-        foreach (['domain' ,'path', 'name'] as $filter) {
-            if (!isset($params[$filter])) continue;
-            $cookies = array_filter($cookies, function ($item) use ($filter, $params) {
-                return $item[$filter] == $params[$filter];
-            });
-        }
-        return $cookies;
     }
 
     public function amOnUrl($url)
@@ -847,11 +834,8 @@ class WebDriver extends \Codeception\Module implements WebInterface, RemoteInter
                 $xpath = Locator::combine($xpath, "//input[@type = 'checkbox' or @type = 'radio'][@value = $locator]");
             }
         }
+        /** @var $context \WebDriverElement  * */
         $els = $context->findElements(\WebDriverBy::xpath($xpath));
-        if (count($els)) {
-            return reset($els);
-        }
-        $els = $context->findElements(\WebDriverBy::xpath(str_replace('ancestor::form', '', $xpath)));
         if (count($els)) {
             return reset($els);
         }

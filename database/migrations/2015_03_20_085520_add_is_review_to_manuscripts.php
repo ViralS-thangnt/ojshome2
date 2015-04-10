@@ -14,7 +14,7 @@ class AddIsReviewToManuscripts extends Migration {
 	{
 		//
 		Schema::table('manuscripts',function($table){
-			$table->tinyInteger('is_review')->after('file');
+			$table->boolean('is_review')->after('is_chief_review')->nullable();
 		});
 	}
 

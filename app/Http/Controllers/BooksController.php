@@ -15,7 +15,7 @@ protected $bookRepo;
 
     public function __construct(BookInterface $bookRepo)
     {
-        //$this->middleware('auth');
+        $this->middleware('auth');
         $this->bookRepo = $bookRepo;
     }
 

@@ -26,7 +26,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
         
         $this->app['debugbar'] = $this->app->share(
             function ($app) {
-                $debugbar = new LaravelDebugBar($app);
+                $debugbar = new LaravelDebugbar($app);
 
                 $sessionManager = $app['session'];
                 $httpDriver = new SymfonyHttpDriver($sessionManager);
@@ -65,8 +65,9 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
 
         $routeConfig = [
             'namespace' => 'Barryvdh\Debugbar\Controllers',
-            'prefix' => '_debugbar',
+            'prefix' => $this->app['config']->get('debugbar.route_prefix'),
         ];
+
         $this->app['router']->group($routeConfig, function($router) {
             $router->get('open', [
                 'uses' => 'OpenHandlerController@handle',

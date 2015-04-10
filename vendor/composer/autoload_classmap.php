@@ -6,6 +6,7 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'AddIsReviewToManuscripts' => $baseDir . '/database/migrations/2015_03_20_085520_add_is_review_to_manuscripts.php',
     'ChromeDriver' => $vendorDir . '/facebook/webdriver/lib/chrome/ChromeDriver.php',
     'ChromeDriverService' => $vendorDir . '/facebook/webdriver/lib/chrome/ChromeDriverService.php',
     'ChromeOptions' => $vendorDir . '/facebook/webdriver/lib/chrome/ChromeOptions.php',
@@ -14,9 +15,11 @@ return array(
     'CreateJournalsTable' => $baseDir . '/database/migrations/2015_03_04_024625_create_journals_table.php',
     'CreateKeywordManuscriptTable' => $baseDir . '/database/migrations/2015_03_10_040351_create_keyword_manuscript_table.php',
     'CreateKeywordsTable' => $baseDir . '/database/migrations/2015_03_10_035717_create_keywords_table.php',
+    'CreateManuscriptFilesTable' => $baseDir . '/database/migrations/2015_03_19_041109_create_manuscript_files_table.php',
     'CreateManuscriptsTable' => $baseDir . '/database/migrations/2015_03_04_014509_create_manuscripts_table.php',
     'CreatePasswordResetsTable' => $baseDir . '/database/migrations/2014_10_12_100000_create_password_resets_table.php',
     'CreateUsersTable' => $baseDir . '/database/migrations/2014_10_12_000000_create_users_table.php',
+    'DataManuscriptSeeder' => $baseDir . '/database/seeds/DataManuscriptSeeder.php',
     'DatabaseSeeder' => $baseDir . '/database/seeds/DatabaseSeeder.php',
     'DesiredCapabilities' => $vendorDir . '/facebook/webdriver/lib/remote/DesiredCapabilities.php',
     'DriverCommand' => $vendorDir . '/facebook/webdriver/lib/remote/DriverCommand.php',
@@ -45,6 +48,7 @@ return array(
     'InvalidElementStateException' => $vendorDir . '/facebook/webdriver/lib/WebDriverExceptions.php',
     'InvalidSelectorException' => $vendorDir . '/facebook/webdriver/lib/WebDriverExceptions.php',
     'JavaScriptExecutor' => $vendorDir . '/facebook/webdriver/lib/JavaScriptExecutor.php',
+    'JournalSeeder' => $baseDir . '/database/seeds/JournalSeeder.php',
     'LocalFileDetector' => $vendorDir . '/facebook/webdriver/lib/remote/LocalFileDetector.php',
     'MoveTargetOutOfBoundsException' => $vendorDir . '/facebook/webdriver/lib/WebDriverExceptions.php',
     'NoAlertOpenException' => $vendorDir . '/facebook/webdriver/lib/WebDriverExceptions.php',

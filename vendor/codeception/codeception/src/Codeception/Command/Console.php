@@ -8,18 +8,14 @@ use Codeception\Events;
 use Codeception\Configuration;
 use Codeception\Event\SuiteEvent;
 use Codeception\Event\TestEvent;
-use Codeception\Lib\Console\Output;
 use Codeception\Scenario;
 use Codeception\SuiteManager;
 use Codeception\TestCase\Cept;
-use Codeception\Util\Debug;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\Question;
 
 /**
  * Try to execute test commands in run-time. You may try commands before writing the test.
@@ -61,19 +57,15 @@ class Console extends Command
 
         $options          = $input->getOptions();
         $options['debug'] = true;
-        $options['silent'] = true;
-        $options['interactive'] = false;
-        $options['colors'] = true;
-
-        Debug::setOutput(new Output($options));
+        $options['steps'] = true;
 
         $this->codecept = new Codecept($options);
         $dispatcher     = $this->codecept->getDispatcher();
 
         $this->test     = (new Cept())
             ->configDispatcher($dispatcher)
-            ->configName('')
-            ->config('file','')
+            ->configName('interactive')
+            ->config('file','interactive')
             ->initConfig();
 
         $suiteManager   = new SuiteManager($dispatcher, $suiteName, $settings);
@@ -97,9 +89,9 @@ class Console extends Command
         $dispatcher->dispatch(Events::TEST_PARSED, new TestEvent($this->test));
         $dispatcher->dispatch(Events::TEST_BEFORE, new TestEvent($this->test));
 
-        $output->writeln("\n\n<comment>\$I</comment> = new {$settings['class_name']}(\$scenario);");
+        $output->writeln("\n\n\$I = new {$settings['class_name']}(\$scenario);");
         $scenario->run();
-        $this->executeCommands($input, $output, $I, $settings['bootstrap']);
+        $this->executeCommands($output, $I, $settings['bootstrap']);
 
         $dispatcher->dispatch(Events::TEST_AFTER, new TestEvent($this->test));
         $dispatcher->dispatch(Events::SUITE_AFTER, new SuiteEvent($this->suite));
@@ -107,19 +99,16 @@ class Console extends Command
         $output->writeln("<info>Bye-bye!</info>");
     }
 
-    protected function executeCommands(InputInterface $input, OutputInterface $output, $I, $bootstrap)
+    protected function executeCommands(OutputInterface $output, Actor $I, $bootstrap)
     {
-        $dialog = new QuestionHelper();
+        $dialog = $this->getHelperSet()->get('dialog');
 
         if (file_exists($bootstrap)) {
             require $bootstrap;
         }
 
         do {
-            $question = new Question("<comment>\$I-></comment>");
-            $question->setAutocompleterValues(array_keys(SuiteManager::$actions));
-
-            $command = $dialog->ask($input, $output, $question);
+            $command = $dialog->ask($output, '$I->', null, array_keys(SuiteManager::$actions));
             if ($command == 'actions') {
                 $output->writeln("<info>" . implode(' ', array_keys(SuiteManager::$actions)));
                 continue;

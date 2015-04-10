@@ -27,6 +27,8 @@
 		<link href="{{ url('assets/css/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css') }}" rel="stylesheet" type="text/css" />
 		<!-- Theme style -->
 		<link href="{{ url('assets/css/AdminLTE.css') }}" rel="stylesheet" type="text/css" />
+		<!--chosen plugin css-->
+		<link href="{{ url('assets/css/chosen.css') }}" rel="stylesheet" type="text/css" />
 		<!-- Custom style -->
 		<link href="{{ url('assets/css/style.css') }}" rel="stylesheet" type="text/css" />
 
@@ -54,6 +56,8 @@
 		<script src="{{ url('assets/js/plugins/datepicker/bootstrap-datepicker.js') }}" type="text/javascript"></script>
 		<!-- Bootstrap WYSIHTML5 -->
 		<script src="{{ url('assets/js/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js') }}" type="text/javascript"></script>
+		<!-- CK Editor -->
+        <script src="{{url('assets/js/plugins/ckeditor/ckeditor.js')}}" type="text/javascript"></script>
 		<!-- iCheck -->
 		<script src="{{ url('assets/js/plugins/iCheck/icheck.min.js') }}" type="text/javascript"></script>
 
@@ -64,6 +68,9 @@
 		<script src="{{ url('assets/js/plugins/datatables/jquery.dataTables.js') }} " type="text/javascript"></script>
 
 		<script src="{{ url('assets/js/plugins/datatables/dataTables.bootstrap.js') }}" type="text/javascript"></script>
+
+		<!--chosen plugin js-->
+		<script src="{{ url('assets/js/chosen.jquery.js') }}" type="text/javascript"></script>
 
 		<!-- DATA TABLES -->
 		<link href="{{ url('assets/css/datatables/dataTables.bootstrap.css') }}" rel="stylesheet" type="text/css" />

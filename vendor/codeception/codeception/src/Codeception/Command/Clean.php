@@ -11,7 +11,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Cleans `output` directory
+ * Cleans `log` directory
  *
  * * `codecept clean`
  * * `codecept clean -c path/to/project`
@@ -22,7 +22,7 @@ class Clean extends Command
     use Shared\Config;
 
     public function getDescription() {
-        return 'Cleans or creates _output directory';
+        return 'Cleans or creates _log directory';
     }
 
     protected function configure()

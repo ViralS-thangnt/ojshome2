@@ -61,9 +61,6 @@ class Cest extends \Codeception\TestCase implements
             $this->executeTestMethod($I);
             $this->executeAfter($this->testMethod, $I);
         } catch (\Exception $e) {
-            if (is_callable([$this->testClassInstance, '_failed'])) {
-                $this->testClassInstance->_failed($I);
-            }
             // fails and errors are now handled by Codeception\PHPUnit\Listener
             throw $e;
         }
@@ -73,7 +70,7 @@ class Cest extends \Codeception\TestCase implements
 
     protected function executeBefore($testMethod, $I)
     {
-        if (is_callable([$this->testClassInstance, '_before'])) {
+        if (method_exists($this->testClassInstance, '_before')) {
             $this->testClassInstance->_before($I);
         }
 
@@ -94,7 +91,7 @@ class Cest extends \Codeception\TestCase implements
             }
         }
 
-        if (is_callable([$this->testClassInstance, '_after'])) {
+        if (method_exists($this->testClassInstance, '_after')) {
             $this->testClassInstance->_after($I);
         }
     }

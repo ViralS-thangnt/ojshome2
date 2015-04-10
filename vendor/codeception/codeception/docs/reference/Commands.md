@@ -12,11 +12,88 @@ Create new test suite. Requires suite name and actor name
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Console
 
 Try to execute test commands in run-time. You may try commands before writing the test.
 
 * `codecept console acceptance` - starts acceptance suite environment. If you use WebDriver you can manipulate browser with Codeception commands.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -28,6 +105,47 @@ Creates empty Group file - extension which handles all group events.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## GenerateCept
 
 Generates Cept (scenario-driven test) file:
@@ -35,6 +153,47 @@ Generates Cept (scenario-driven test) file:
 * `codecept generate:cept suite Login`
 * `codecept g:cept suite subdir/subdir/testnameCept.php`
 * `codecept g:cept suite LoginCept -c path/to/project`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -82,6 +241,47 @@ Options:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## SelfUpdate
 
 Auto-updates phar archive from official site: 'http://codeception.com/codecept.phar' .
@@ -92,12 +292,89 @@ Auto-updates phar archive from official site: 'http://codeception.com/codecept.p
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## GenerateTest
 
 Generates skeleton for Unit Test that extends `Codeception\TestCase\Test`.
 
 * `codecept g:test unit User`
 * `codecept g:test unit "App\User"`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -112,11 +389,93 @@ Starting from Codeception 2.0 actor classes are auto-generated. Use this command
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## GenerateHelper
 
 Creates empty Helper class.
 
 * `codecept g:helper MyHelper`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -139,6 +498,50 @@ For Codeception 1.x compatible setup run bootstrap in `--compat` option.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## GeneratePhpUnit
 
 Generates skeleton for unit test as in classical PHPUnit.
@@ -146,6 +549,47 @@ Generates skeleton for unit test as in classical PHPUnit.
 * `codecept g:phpunit unit UserTest`
 * `codecept g:phpunit unit User`
 * `codecept g:phpunit unit "App\User`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -160,6 +604,51 @@ Generates user-friendly text scenarios from scenario-driven tests (Cest, Cept).
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## GenerateStepObject
 
 Generates StepObject class. You will be asked for steps you want to implement.
@@ -170,12 +659,87 @@ Generates StepObject class. You will be asked for steps you want to implement.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Clean
 
-Cleans `output` directory
+Cleans `log` directory
 
 * `codecept clean`
 * `codecept clean -c path/to/project`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -192,6 +756,47 @@ Generates Cest (scenario-driven object-oriented test) file:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## GeneratePageObject
 
 Generates PageObject. Can be generated either globally, or just for one suite.
@@ -200,6 +805,49 @@ If PageObject is generated globally it will act as UIMap, without any logic in i
 * `codecept g:page Login`
 * `codecept g:page Registration`
 * `codecept g:page acceptance Login`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

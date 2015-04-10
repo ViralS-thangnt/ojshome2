@@ -70,6 +70,55 @@ Check out drivers if you get problems loading dumps and cleaning databases.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### dontSeeInDatabase
  
 Effect is opposite to ->seeInDatabase
@@ -95,6 +144,9 @@ Fails if such user was found.
  * `param array` $criteria
 
 
+
+
+
 ### grabFromDatabase
  
 Fetches a single column value from a database.
@@ -116,6 +168,7 @@ $mail = $I->grabFromDatabase('users', 'email', array('name' => 'Davert'));
 
 
 
+
 ### haveInDatabase
  
 Inserts SQL record into database. This record will be erased after the test.
@@ -129,6 +182,11 @@ $I->haveInDatabase('users', array('name' => 'miles', 'email' => 'miles@davis.com
  * `param` $table
  * `param array` $data
  * `return integer` $id
+
+
+
+
+
 
 
 ### seeInDatabase

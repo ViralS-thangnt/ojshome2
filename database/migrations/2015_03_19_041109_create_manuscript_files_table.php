@@ -23,6 +23,7 @@ class CreateManuscriptFilesTable extends Migration {
 			$table->integer('total_page')->nullable();
 			$table->string('extension', 50)->nullable();
 
+			$table->timestamp('deleted_at')->nullable();
 			$table->timestamps();
 		});
 	}

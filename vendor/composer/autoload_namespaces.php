@@ -30,6 +30,8 @@ return array(
     'Mockery' => array($vendorDir . '/mockery/mockery/library'),
     'JakubOnderka\\PhpConsoleHighlighter' => array($vendorDir . '/jakub-onderka/php-console-highlighter/src'),
     'JakubOnderka\\PhpConsoleColor' => array($vendorDir . '/jakub-onderka/php-console-color/src'),
+    'Faker\\PHPUnit' => array($vendorDir . '/fzaninotto/faker/test'),
+    'Faker' => array($vendorDir . '/fzaninotto/faker/src'),
     'Dotenv' => array($vendorDir . '/vlucas/phpdotenv/src'),
     'Doctrine\\Instantiator\\' => array($vendorDir . '/doctrine/instantiator/src'),
     'Doctrine\\DBAL\\' => array($vendorDir . '/doctrine/dbal/lib'),
@@ -42,6 +44,6 @@ return array(
     'Diff' => array($vendorDir . '/phpspec/php-diff/lib'),
     'DebugBar' => array($vendorDir . '/maximebf/debugbar/src'),
     'Cron' => array($vendorDir . '/mtdowling/cron-expression/src'),
-    'Codeception' => array($vendorDir . '/janhenkgerritsen/codeception-laravel5/src', $vendorDir . '/codeception/codeception/src'),
+    'Codeception' => array($vendorDir . '/codeception/codeception/src', $vendorDir . '/janhenkgerritsen/codeception-laravel5/src'),
     'Carbon' => array($vendorDir . '/nesbot/carbon/src'),
 );

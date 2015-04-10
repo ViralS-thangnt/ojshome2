@@ -20,6 +20,49 @@ This module cleans all cached data after each test.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### dontSeeInTable
  
 Checks table doesn't contain row with specified values
@@ -35,6 +78,9 @@ $I->dontSeeInTable('User', array('name' => 'Davert', 'email' => 'davert@mail.com
 
  * `param` $model
  * `param array` $values
+
+
+
 
 
 ### grabFromTable
@@ -53,6 +99,10 @@ $mail = $I->grabFromTable('User', 'email', array('name' => 'Davert'));
  * `param` $model
  * `param` $column
  * `param array` $values
+
+
+
+
 
 
 ### seeInTable

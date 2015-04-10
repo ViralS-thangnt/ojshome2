@@ -31,14 +31,16 @@ class ManuscriptRequest extends Request {
 		return [
 			'type'					=> 'required', 
 			'expect_journal_id'		=> 'numeric', 
-			'name'					=> array('required', 'regex:/^[-\w]+(?:\W+[-\w]+){0,20}\W*$/'), //'required|max:20', 
-			'summary_vi'			=> array('required', 'regex:/^[-\w]+(?:\W+[-\w]+){149,199}\W*$/'), //'required|min:150|max:200', 
+			'name'					=> array('required', 'regex:/^[-\w]+(?:\W+[-\w]+){0,19}\W*$/u'), //'required|min:0|max:20', 
+			'summary_vi'			=> array('required', 'regex:/^[-\w]+(?:\W+[-\w]+){149,199}\W*$/u'), //'required|min:150|max:200', 
+
 			'keyword_vi'			=> 'required|max:5|min:3', 
-			'summary_en'			=> array('required', 'regex:/^[-\w]+(?:\W+[-\w]+){149,199}\W*$/'),//'required|min:150|max:200', 
+			'summary_en'			=> array('required', 'regex:/^[-\w]+(?:\W+[-\w]+){149,199}\W*$/u'),//'required|min:150|max:200', 
 			'keyword_en'			=> 'required|max:5|min:3', 
 			'topic'					=> 'required', 
 			'confirm'				=> 'in:1', 
 			'file'					=> 'required'
+			// ^[^\p{L}\p{M}\p{Nd}\p{Pc}]*(?:[\p{L}\p{M}\p{Nd}\p{Pc}]+\b[^\p{L}\p{M}\p{Nd}\p{Pc}]*){10,100}$
 		];
 	}
 

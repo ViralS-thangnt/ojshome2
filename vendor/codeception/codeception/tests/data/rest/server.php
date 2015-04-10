@@ -20,11 +20,6 @@ function RESTServer()
             $data = json_decode($tmp);
         }
 
-        $response = call_user_func($callback, $data);
-        if (is_scalar($response)) {
-            print $response;
-            return;
-        }
-        print json_encode($response);
+        print json_encode(call_user_func($callback, $data));
     }
 }

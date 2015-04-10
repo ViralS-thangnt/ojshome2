@@ -14,7 +14,14 @@
         </div>
         
         <!-- sidebar menu: : style can be found in sidebar.less -->
-        @yield('left-column')                   
+        
+                   
+        @yield('left-column')  
+        @section('left-column-menu')
+        {!! getMenuItem($permissions) !!}
+        @show  
+        
+        {!! Form::menu_item('Report', Constant::$report_menu, ICON_MENU_CHART) !!} 
     </section>
 </aside>
             

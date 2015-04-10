@@ -23,11 +23,6 @@
 
 @stop
 
-<!-- Left column -->
-@section('left-column')
-{!! getMenuItem($permissions) !!} 
-@stop
-
 @section('content')
 	
 <script type="text/javascript">
@@ -71,15 +66,32 @@
 		</tfoot>
 		<tbody role="alert" aria-live="polite" aria-relevant="all">
 			<input type="hidden" value ='{!! $is_odd = true !!}'/>
+
 			@foreach($result['data'] as $row)
 				
 				<tr class="{{ ($is_odd) ? 'odd' : 'even' }}">
 
-					@foreach( $result['col_db'] as $col)						
-							<td class="center" > {!! empty($row->$col) ? '-' : $row->$col !!} </td>
+					@foreach( $result['col_db'] as $col)					
+						<td class="center" > {!! empty($row->$col) ? '-' : $row->$col !!} </td>
 					@endforeach
-					
-					<td class="center"><a href = "{{ url(Constant::$author_per['admin.manuscript.create'] . '/' . $row->id) }}"> {!! Lang::get('admin.manuscript.more_detail') !!} </a></td>
+
+					@if (!in_array(AUTHOR, $permissions))
+						<!-- Editors -->
+						<td class="center"><a href = "{{ url('admin/editor-manuscript/form/' . $row->id) }}"> {!! Lang::get('admin.manuscript.more_detail') !!} </a></td>
+					@else
+
+						<!-- Author -->
+						@if (isset($stage) and $stage == EDITING and $row->is_print_out == PRINT_OUT)
+							<!-- has print out from layout editor -->
+							<td class="center"><a href = "{{ url('admin/editor-manuscript/form/' . $row->id) }}"> {!! Lang::get('admin.manuscript.more_detail') !!} </a></td>
+
+						@else (isset($stage) and $stage != EDITING and $row->is_print_out == NOT_PRINT_OUT)
+							<!-- else -->
+							<td class="center"><a href = "{{ url('admin/manuscript/form/' . $row->id) }}"> {!! Lang::get('admin.manuscript.more_detail') !!} </a></td>
+						
+						@endif
+						
+					@endif
 				</tr>
 
 			@endforeach

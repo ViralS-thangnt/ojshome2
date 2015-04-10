@@ -17,6 +17,7 @@ class CreateKeywordsTable extends Migration {
 			$table->increments('id');
 			$table->string('lang_code', 20);
 			$table->string('text');
+			$table->timestamp('deleted_at')->nullable();
 			$table->timestamps();
 		});
 	}

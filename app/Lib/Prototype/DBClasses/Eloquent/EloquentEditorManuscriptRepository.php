@@ -13,4 +13,18 @@ class EloquentEditorManuscriptRepository extends AbstractEloquentRepository impl
         $this->model = $model;
         $this->user = \Auth::user();
     }
+
+    public function formModify($data, $id = null)
+    {
+        if ($id) {
+            $editor_manuscript = $this->model->find($id);
+        } else {
+            $editor_manuscript = $this->model;
+        }
+
+        $editor_manuscript->fill($data);     
+        $editor_manuscript->save();
+
+        return $editor_manuscript;
+    }
 }

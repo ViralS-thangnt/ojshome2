@@ -1,0 +1,1 @@
+{{ empty($review) ? '0' : e($review) }}

@@ -50,6 +50,55 @@ To use this module with Composer you need <em>"videlalvaro/php-amqplib": "*"</em
 @author davert
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### grabMessageFromQueue
  
 Takes last message from queue.
@@ -58,6 +107,8 @@ $message = $I->grabMessageFromQueue('queue.emails');
 
  * `param` $queue
 @return AMQPMessage
+
+
 
 
 ### pushToExchange
@@ -88,6 +139,7 @@ $I->pushToQueue('queue.jobs', new AMQPMessage('create'));
 
  * `param` $queue
  * `param` $message string|AMQPMessage
+
 
 
 ### seeMessageInQueueContainsText

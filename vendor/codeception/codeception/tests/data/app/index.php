@@ -29,8 +29,7 @@ $urls = array(
     '/facebook\??.*' => 'facebookController',
     '/form/(.*?)(#|\?.*?)?' => 'form',
     '/articles\??.*' => 'articles',
-    '/auth' => 'httpAuth',
-    '/register' => 'register'
+    '/auth' => 'httpAuth'
 );
 
 glue::stick($urls);

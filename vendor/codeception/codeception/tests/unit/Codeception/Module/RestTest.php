@@ -240,8 +240,6 @@ class RestTest extends \PHPUnit_Framework_TestCase
         $this->module->seeResponseJsonMatchesXpath('//book/category');
         $this->module->seeResponseJsonMatchesJsonPath('$..book');
         $this->module->seeResponseJsonMatchesJsonPath('$.store.book[2].author');
-        $this->module->dontSeeResponseJsonMatchesJsonPath('$.invalid');
-        $this->module->dontSeeResponseJsonMatchesJsonPath('$.store.book.*.invalidField');
     }
 
 
@@ -249,7 +247,6 @@ class RestTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('PHPUnit_Framework_AssertionFailedError');
     }
-
 
 }
 

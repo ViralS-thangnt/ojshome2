@@ -153,7 +153,9 @@ return [
         'App\Providers\MacroServiceProvider',
         'App\Providers\HtmlServiceProvider',
         'Barryvdh\Debugbar\ServiceProvider',
-
+        'App\Providers\JournalServiceProvider',
+        'App\Providers\KeywordServiceProvider',
+        'App\Providers\ComposerServiceProvider',
     ],
 
     /*

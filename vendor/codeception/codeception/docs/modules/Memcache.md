@@ -26,9 +26,53 @@ Be sure you don't use the production server to connect.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### clearMemcache
  
 Flushes all Memcached data.
+
+
 
 
 ### dontSeeInMemcached
@@ -37,6 +81,9 @@ Checks item in Memcached doesn't exist or is the same as expected.
 
  * `param` $key
  * `param bool` $value
+
+
+
 
 
 ### grabValueFromMemcached
@@ -53,6 +100,9 @@ $users_count = $I->grabValueFromMemcached('users_count');
 
  * `param` $key
 @return array|string
+
+
+
 
 
 ### seeInMemcached

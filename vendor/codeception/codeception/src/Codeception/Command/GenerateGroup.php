@@ -26,10 +26,6 @@ class GenerateGroup extends Command
         ));
     }
 
-    public function getDescription() {
-        return 'Generates Group subscriber';
-    }
-
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $config = $this->getGlobalConfig($input->getOption('config'));

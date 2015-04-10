@@ -59,7 +59,6 @@ namespace Codeception\Module;
  *              timeout: 120
  *              user: 'root'
  *              password: 'root'
- *              key: ~/.ssh/id_rsa
  *              tmp: 'tests/_data/ftp'
  *              passive: true
  *              cleanup: false
@@ -76,7 +75,6 @@ namespace Codeception\Module;
  *              timeout: 120
  *              user: 'root'
  *              password: 'root'
- *              key: ''
  *              tmp: 'tests/_data/ftp'
  *              cleanup: false
  *
@@ -553,12 +551,6 @@ class FTP extends \Codeception\Module\Filesystem
                 if ($this->ftp === false) {
                     $this->ftp = null;
                     \PHPUnit_Framework_Assert::fail('failed to connect to ftp server');
-                }
-
-                if(isset($this->config['key'])) {
-                    $keyFile = file_get_contents($this->config['key']);
-                    $password = new \Crypt_RSA();
-                    $password->loadKey($keyFile);
                 }
 
                 if (!$this->ftp->login($user, $password)) {

@@ -24,11 +24,146 @@ Form::macro('input_text', function($name, $label, $type = 'text', $help_block = 
 	return $html;
 });
 
-Form::macro('input_select', function($name, $label, $value = array(), $help_block = '') {
+Form::macro('output_text', function($label, $content) {
+	$html = '<dt>'.$label.'</dt>';
+	$html .= '<dd>'.$content.'</dd>';
+
+	return $html;
+});
+
+Form::macro('output_list', function($title, $list = array()) {
+	$html = '<h3>'.$title.'</h3><ul>';
+	foreach ($list as $value) {
+		$html .= '<li>'.$value.'</li>';
+	}
+	$html .= '</ul>';
+
+	return $html;
+});
+
+Form::macro('section', function($title, $comment, $decide, $anchor = false) {
+	$anchor = $anchor ? $anchor : '';
+	$html = '<section id="">';
+	$html .= '<h2 class="page-header"><a href="#'.$anchor.'">'.$title.'</a></h2>';
+	$html .= '<p class="lead">'.$comment.'</p>';
+	//dd(trans(Constant::$full_decide[$decide]));
+	$html .= '<b>'.trans(Constant::$full_decide[$decide]).'</b>';
+	$html .= '</section>';
+
+	return $html;
+});
+
+Form::macro('editor', function($label, $name, $disabled = false, $type = 'ck_editor',$content = null) {
+	$options = ['id' => $name, 'rows' => 10, 'cols' => 80];
+
+	if ($type == 'html5') {
+		$html = '<script type="text/javascript">
+		            $(function() {
+		                //bootstrap WYSIHTML5 - text editor
+		                $("#'.$name.'").wysihtml5();
+		            });
+		        </script>';
+		$options['class'] = 'textarea';
+		$tools = '<div class="pull-right box-tools">
+                    <button class="btn btn-default btn-sm" data-widget="collapse" data-toggle="tooltip" title="Collapse"><i class="fa fa-minus"></i></button>
+                    <button class="btn btn-default btn-sm" data-widget="remove" data-toggle="tooltip" title="Remove"><i class="fa fa-times"></i></button>
+                 </div><!-- /. tools -->';
+	} else {
+		$html = '<script type="text/javascript">
+		            $(function() {
+		                // Replace the <textarea id="editor1"> with a CKEditor
+                		// instance, using default configuration.
+		                CKEDITOR.replace("'.$name.'");
+		            });
+		        </script>';
+		$tools = '';
+	}
+
+	if ($disabled) {
+		$options['disabled'] = 'disabled';
+	}
+
+	$html .= '<div class="box-header">';
+	$html .= '<h3 class="box-title">'.$label.'</h3>';
+	$html .= $tools;
+	$html .= '</div><!-- /.box-header -->';
+    $html .= '<div class="box-body pad">
+    		 '.Form::textarea($name, $content, $options).'
+            </div>';
+
+	return $html;
+});
+
+Form::macro('date_range', function($name, $label, $time = false) {
+	$icon = $time ? '<i class="fa fa-clock-o"></i>' : '<i class="fa fa-calendar"></i>';
+	$html = '<div class="form-group">
+                <label>'.$label.':</label>
+                <div class="input-group">
+                    <div class="input-group-addon">'.
+                        $icon
+                    .'</div>'.
+                    Form::text($name, null, ['class' => 'form-control pull-right', 'id' => $name, 'readonly' => 'readonly'])
+                .'</div><!-- /.input group -->
+            </div><!-- /.form group -->';
+    $config = $time ? "timePicker: true, timePickerIncrement: 1, format: 'DD/MM/YYYY,HH:MM:SS'" : "timePickerIncrement: 1, format: 'DD/MM/YYYY'";
+    $html .= '<script type="text/javascript">
+            	$(function() {
+            		$(\'#'.$name.'\').daterangepicker({'.$config.'});
+            	});
+              </script>';
+
+    return $html;
+});
+
+Form::macro('date_pick', function($name, $label) {
+	return '<div class="form-group">
+                <label>'.$label.':</label>
+                <div class="input-group">
+                    <div class="input-group-addon">
+                    <i class="fa fa-calendar"></i></div>'.
+                    Form::text($name, null, ['class' => 'form-control pull-right', 'id' => $name, 'readonly' => 'readonly'])
+                .'</div><!-- /.input group -->
+            </div><!-- /.form group -->
+            <script type="text/javascript">
+            	$(function() {
+            		$(\'#'.$name.'\').datepicker({
+            			format: \'mm/dd/yy\',
+            			enableOnReadonly: true
+            		});
+            	});
+              </script>';
+});
+
+Form::macro('multi_select', function($name, $label, $value = array(), $help_block = '') {
+	//translate data
+	foreach ($value as $key => $item) {
+		$value[$key] = trans($item);
+	}
+
 	$html = '<div class="form-group">';
 	$html .= Form::label($name, $label, ['class' => 'text-form-large']);
 	$html .= '<p class="help-block-custom ">'.$help_block.'</p>';
-	$html .= Form::select($name, $value, null, ['class' => 'form-control']);
+	$html .= Form::select($name, $value, null, ['class' => 'chosen-select', 'multiple' => 'multiple']);
+	$html .= '</div>';
+
+	return $html;
+});
+
+Form::macro('input_select', function($name, $label, $value = array(), $help_block = '', $disabled = false) {
+	//translate data
+	foreach ($value as $key => $item) {
+		$value[$key] = trans($item);
+	}
+
+	$options = ['class' => 'form-control'];
+	if ($disabled == true) {
+		$options['disabled'] = 'disabled';
+	}
+
+	$html = '<div class="form-group">';
+	$html .= Form::label($name, $label, ['class' => 'text-form-large']);
+	$html .= '<p class="help-block-custom ">'.$help_block.'</p>';
+	$html .= Form::select($name, $value, null, $options);
 	$html .= '</div>';
 
 	return $html;
@@ -83,12 +218,14 @@ Form::macro('combobox_custom', function($name = 'combobox',
 										$data = array(), 
 										$class = 'form-control',
 										$is_multiple = true,
-										$selected = array(0)){
+										$disabled = false,
+										$selected = null){
+	$disabled = ($disabled) ? ' disabled ' : '' ;
 	if($is_multiple)
 
-		return $result = Form::select($name, $data, null, ['class' => $class, 'multiple' => 'multiple', 'name' => $name . '[]']);
+		return $result = Form::select($name, $data, $selected, ['class' => $class, 'multiple' => 'multiple', $disabled => '', 'name' => $name . '[]']);
 	
-	return $result = Form::select($name, $data, null, ['class' => $class, 'name' => $name . '[]']);
+	return $result = Form::select($name, $data, $selected, ['class' => $class, $disabled => '', 'name' => $name . '[]']);
 });
 
 // Custom help block style
@@ -104,14 +241,17 @@ Form::macro('textarea_custom',
 						$rows = 5, 
 						$placeholder = 'Enter something...', 
 						$class = 'form-control',
-						$attr = ['' => '']){
+						$attr = ['' => ''],
+						$disabled = false){
 					// dd('dfjkls');
+	$disabled = ($disabled) ? ' disabled ' : '' ;
+
 	if ($rows == 1) {
 
-		return $result = Form::text($name, $content, ['class' => $class, 'placeholder' => $placeholder, key($attr) => current($attr)]);
+		return $result = Form::text($name, $content, ['class' => $class, 'placeholder' => $placeholder, $disabled => '',  key($attr) => current($attr)]);
 	} 
 
-	return $result = Form::textarea($name, $content, ['class' => $class, 'placeholder' => $placeholder, 'rows' => $rows, key($attr) => current($attr)]);
+	return $result = Form::textarea($name, $content, array_merge(['class' => $class, 'placeholder' => $placeholder, $disabled => '', 'rows' => $rows], $attr));
 });
 
 // Custom image

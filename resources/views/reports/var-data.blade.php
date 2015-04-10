@@ -1,1 +1,1 @@
-{{ e($data) }}
+{{ e($data['count_manu']) }}

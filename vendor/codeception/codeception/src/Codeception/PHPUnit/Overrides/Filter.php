@@ -7,12 +7,11 @@ class PHPUnit_Util_Filter
         $stackTrace = $asString ? '' : array();
 
         $trace = $e->getPrevious() ? $e->getPrevious()->getTrace() : $e->getTrace();
-        if ($e instanceof \PHPUnit_Framework_ExceptionWrapper) {
-            $trace = $e->getSerializableTrace();
-        }
 
         foreach ($trace as $step) {
-
+            if (! isset($step['file'])) {
+                continue;
+            }
             if (self::classIsFiltered($step)) {
                 continue;
             }
@@ -20,11 +19,8 @@ class PHPUnit_Util_Filter
                 continue;
             }
 
-            if (!$asString) {
+            if (! $asString) {
                 $stackTrace[] = $step;
-                continue;
-            }
-            if (!isset($step['file'])) {
                 continue;
             }
 

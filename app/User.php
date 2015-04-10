@@ -38,19 +38,32 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 
     public function getFullNameAttribute()
     {
+        
         return $this->attributes['last_name'].' '.$this->attributes['middle_name'].' '.$this->attributes['first_name'];
     }
-
 
     //Define User relationship
     public function manuscripts()
     {
+        
         return $this->hasMany('App\Manuscript', 'author_id');
     }
 
-
     public function editorManuscripts()
     {
-        return $this->hasMany('App\EditorManuscript');
+        
+        return $this->hasMany('App\EditorManuscript', 'user_id', 'id');
+    }
+
+    public function manuscriptFiles()
+    {
+        
+        return $this->hasMany('App\ManuscriptFile', 'user_id', 'id');
+    }
+    //Define User scope
+    public function scopeActor($query, $actor)
+    {
+        
+        return $query->whereRaw('FIND_IN_SET(?, actor_no)', [$actor]);
     }
 }

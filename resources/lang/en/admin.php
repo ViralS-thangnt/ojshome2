@@ -2,7 +2,7 @@
 
 return [
 	// new OJS system
-	'manuscript.title_page_admin'	=>	"DRAFT",
+	'manuscript.title_page_admin'	=>	"Manuscript",
 	'manuscript.manuscript_info'	=>	"Manuscript infomation",
 
 	//manuscript
@@ -29,6 +29,7 @@ return [
 	'edit'						=>	'Edit',
 	'delete'					=>	'Delete',
 	'emptyData'					=>	'No match record found',
+	'detail'					=>   'Detail',
 
 	//message
 	'FailedLoginMessage'		=>	'These credentials do not match our records.',
@@ -58,6 +59,7 @@ return [
 	'manuscript.create.title_policy'		=>	'English Tôi đã đọc và đồng ý với các điều khoản và chính sách của ban biên tập',
 	'manuscript.create.policy_yes'			=>	'English Đồng ý',
 	'manuscript.create.policy_no'			=>	'English Không đồng ý',
+	'manuscript.create.policy_content'		=>	'English Đây là nội dung và điều khoản của ban biên tập...',
 
 	'manuscript.create.help.name'						=>	'English (Nhập tên bài viết. Tối đa 20 từ)',
 	'manuscript.create.help.summary_vi'					=>	'English (Nhập tóm tắt Tiếng Việt. Độ dài từ 150 - 200 từ)',
@@ -76,8 +78,9 @@ return [
 	'manuscript.create.placeholder.co_author'			=>	'English Bạn hãy nhập thông tin của đồng tác giả nếu có...',
 	'manuscript.create.placeholder.policy'				=>	'English Đây là thông tin điều khoản mà bạn phải đọc và đồng ý blah blah...',
 
+
 	'manuscript.create.submit'			=>	'English Gửi bài',
-	'manuscript.create.save'			=>	'English Lưu',
+	'manuscript.create.save'			=>	'English Lưu nháp',
 	// manuscript - generalEnglish 
 	'manuscript.title'					=>	'English Thông tin bản thảo',
 	'manuscript.header_title'			=>	'English Chi tiết',
@@ -130,4 +133,87 @@ return [
 	'EditingStage' 				=>	'Editing',
 	'PublishingStage'			=>	'Publishing',
 	'round'						=>	'Round',
+
+	//journal
+	'jounal.create'						=> 'Create New Journal',
+	'jounal.all'						=> 'List Journals',
+	'journal.title' 					=> 'English Tạp chí',
+	'journal.journal_info'				=> 'English Thông tin tạp chí',
+	'journal.create.detail.header'		=> 'English Chi tiết',
+	'journal.create.navigation.journal'	=> 'English Tạp chí',
+	'journal.create.navigation.create'	=> 'English Tạo mới tạp chí',
+	'journal.create.name'				=> 'English Tên tạp chí',
+	'journal.create.help.name'			=> 'English (Nhập tên tạp chí. Tối thiểu 2 từ khoá)',
+	'journal.create.placeholder.name' 	=> 'English (Nhập tên tạp chí. Tối thiểu 2 từ khoá)',
+	'journal.create.num'				=> 'English Số tạp chí',
+	'journal.create.help.num'    		=> 'English Chỉ được nhập số ở đây',
+	'journal.create.placeholder.num'	=> 'English (Nhập số tạp chí)',
+	'journal.create.upload.header' 		=> 'English Tải lên ảnh bìa',
+	'journal.create.publish'			=> 'English Ngày đăng tạp chí(dự kiến)',
+	'journal.create.help.publish'		=> '(English Ngày đăng tạp chí)',
+	'journal.create.expect_publish'		=> 'English Ngày đăng tạp chí( thực tế)',
+	'journal.create.help.expect_publish'=> 'English Cập nhật ngày đăng tạp chí(Thực tế)',
+
+	//validate journal
+	'journal.name.required'				=> 'En Bạn phải nhập tên tạp chí',
+	'journal.name.min'					=> 'En Độ dài tên tạp chí phải lớn hơn 2 từ',
+	'journal.num.required'				=> 'En Bạn phải nhập số tạp chí',
+	'journal.num.numeric'				=> 'En Số tạp chí: Chỉ được nhập ký tự là chữ số',
+	'journal.publish_at.required'		=> 'En Bạn phải nhập ngày đăng tạp chí (dự kiến)',
+	'journal.cover.image'				=> 'En Ảnh bìa phải có định dạng jpeg, png, bmp, hoặc gif',
+
+
+	//keyword
+	'keyword.create'					=> 'En Create New Keyword',
+	'keyword.all'						=> 'En List Keyword',
+	'keyword.lang_code.required'		=> 'En Bạn phải chọn ngôn ngữ cho keyword',
+	'keyword.text.required'				=> 'En Bạn phải nhập keyword',
+	'keyword.title'						=> 'En Keyword',
+	'keyword.keyword_info'				=> 'En Thông tin keyword',
+	'keyword.create.navigation.keyword' => 'En List keyword',
+	'keyword.create.navigation.create'	=> 'En Create New Keyword',
+	'keyword.create.type'				=> 'En Ngôn ngữ',
+	'keyword.create.name'  				=> 'En Keyword',
+	'keyword.create.placeholder.name'	=> 'En Keyword',
+
+	//decide
+	'decide' 				=>	'Decide',
+	'refuse'				=>	'Refuse',
+	'accept'				=>	'Accept',
+	'requireEdit' 			=>	'Require Edit',
+	'reReview'				=>	'Review Again',
+
+	'ScreeningStage'	=>	'Screening',
+	'ReviewingStage'	=>	'Reviewing',
+	'EditingStage'		=>	'Editing',
+	'PublishingStage'	=>	'Publishing',
+
+	'editorComments' => 'Comments',
+
+	'manuscript.info'	=>	'Manuscript Information',
+	'manuscript.editor' =>	'Editor Manuscript',
+
+	'manuscript.assign'	=>	'Assign',
+
+	//alert
+	'manuscript.alertSelectScreeningEditor' => 'Please select Screening Editor',
+	'error.333.message'						=>	'You can not access this page !!!',
+
+	//
+	'report.inner.journal_number'			=>	'Số tạp chí',
+
+
+
+
+
+	//button
+	'rejected'	=>	'Rejected',
+	'withdrawn'	=>	'English Rút nộp',
+	'download'	=>	'Download',
+
+	//title
+	'reviewed.reviewers.list' => 'Reviewed Reviewers List',
+	'reject.reviewers.list' => 'Rejected Reviewers List',
+	'invite.reviewers.list' => 'Invite Reviewer List',
 ];
+

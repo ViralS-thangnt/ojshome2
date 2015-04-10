@@ -8,17 +8,21 @@ class EditorManuscript extends Model
 
 
 	protected $table    = 'editor_manuscripts';
-	protected $fillable = ['stage', 'manuscript_id', 'user_id', 'loop', 'comments', 'decide',
-						  'editor_suggested_id', 'file', 'delivery_at', 'deadline_at'];
-    protected $appends = ['process'];
+	protected $fillable = ['stage', 'current_id', 'manuscript_id', 'user_id', 'loop', 'comments', 'decide',
+						  'editor_suggested_id', 'delivery_at', 'deadline_at', 'is_sent'];
+    protected $appends = ['process', 'decide_text'];
 
     public function getProcessAttribute()
     {
-        if ($this->attributes['stage'] == EDITING) {
-            return trans(Constant::$stage[$this->attributes['stage']]);
-        } else {
-            return trans(Constant::$stage[$this->attributes['stage']]).' '.trans('admin.round').' '.$this->attributes['loop'];
-        }
+        
+        return makeProcessName($this->attributes['stage'], $this->attributes['loop']);
+    }
+
+    public function getDecideTextAttribute()
+    {
+        $decide = array_merge(Constant::$decide, Constant::$child_decide);
+
+        return $decide[$this->attributes['decide']];
     }
 
 	public function manuscripts()
@@ -29,11 +33,16 @@ class EditorManuscript extends Model
     //define relationship
     public function user()
     {
-        return $this->belongsTo('App\User');
+        return $this->belongsTo('App\User', 'user_id', 'id');
     }
 
     public function manuscript()
     {
         return $this->belongsTo('App\Manuscript', 'manuscript_id');
+    }
+
+    public function scopeReviewTime($query)
+    {
+        $query->selectColumns(['(deadline_at - delivery_at) as review_time']);
     }
 }

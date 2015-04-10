@@ -109,7 +109,7 @@ class HTML extends \Codeception\PHPUnit\ResultPrinter
         $scenarioTemplate->setVar(
           array(
             'id'             => ++$this->id,
-            'name'           => htmlentities($name),
+            'name'           => $name,
             'scenarioStatus' => $scenarioStatus,
             'steps'          => $stepsBuffer,
 	        'time' => round($time, 2)

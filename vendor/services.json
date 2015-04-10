@@ -33,7 +33,10 @@
         "App\\Providers\\EditorManuscriptServiceProvider",
         "App\\Providers\\MacroServiceProvider",
         "App\\Providers\\HtmlServiceProvider",
-        "Barryvdh\\Debugbar\\ServiceProvider"
+        "Barryvdh\\Debugbar\\ServiceProvider",
+        "App\\Providers\\JournalServiceProvider",
+        "App\\Providers\\KeywordServiceProvider",
+        "App\\Providers\\ComposerServiceProvider"
     ],
     "eager": [
         "Illuminate\\Auth\\AuthServiceProvider",
@@ -57,7 +60,10 @@
         "App\\Providers\\UserServiceProvider",
         "App\\Providers\\EditorManuscriptServiceProvider",
         "App\\Providers\\MacroServiceProvider",
-        "Barryvdh\\Debugbar\\ServiceProvider"
+        "Barryvdh\\Debugbar\\ServiceProvider",
+        "App\\Providers\\JournalServiceProvider",
+        "App\\Providers\\KeywordServiceProvider",
+        "App\\Providers\\ComposerServiceProvider"
     ],
     "deferred": {
         "command.app.name": "Illuminate\\Foundation\\Providers\\ArtisanServiceProvider",

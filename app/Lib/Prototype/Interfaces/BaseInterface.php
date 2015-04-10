@@ -12,4 +12,8 @@ interface BaseInterface {
     public function create($data);
     public function formModify($data, $id = null);
     public function delete($id);
+    public function getPermissions();//get all permissions of current user
+    public function getPermission($index = 0); //get one permission of current user
+    public function hasPermission($actor_id);//check if current user have a permission
+    public function hasPermissions($actor_ids = array());//check if current user have one of some given permission
 }

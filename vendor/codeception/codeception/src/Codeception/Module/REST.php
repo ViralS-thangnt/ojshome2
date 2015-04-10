@@ -357,12 +357,7 @@ class REST extends \Codeception\Module
             $header = str_replace('-','_',strtoupper($header));
             $this->client->setServerParameter("HTTP_$header", $val);
 
-            // Issue #1650 - Symfony BrowserKit changes HOST header to request URL
-            if (strtolower($header) == 'host') {
-                $this->client->setServerParameter("HTTP_ HOST", $val);
-            }
-
-            // Issue #827 - symfony foundation requires 'CONTENT_TYPE' without HTTP_
+            # Issue #827 - symfony foundation requires 'CONTENT_TYPE' without HTTP_
             if ($this->isFunctional and $header == 'CONTENT_TYPE') {
                 $this->client->setServerParameter($header, $val);
             }
@@ -371,8 +366,6 @@ class REST extends \Codeception\Module
         // allow full url to be requested
         $url = (strpos($url, '://') === false ? $this->config['url'] : '') . $url;
 
-        $this->params = $parameters;
-        
         $parameters = $this->encodeApplicationJson($method, $parameters);
 
         if (is_array($parameters) || $method == 'GET') {
@@ -606,6 +599,7 @@ class REST extends \Codeception\Module
      * This assertion allows you to check the structure of response json.
      *     *
      * ```json
+     * ```json
      *   { "store": {
      *       "book": [
      *         { "category": "reference",
@@ -692,17 +686,6 @@ class REST extends \Codeception\Module
     {
         $this->assertNotEmpty((new JsonArray($this->response))->filterByJsonPath($jsonPath),
             "Received JSON did not match the JsonPath provided\n".$this->response);
-    }
-
-    /**
-     * Opposite to seeResponseJsonMatchesJsonPath
-     *
-     * @param array $jsonPath
-     */
-    public function dontSeeResponseJsonMatchesJsonPath($jsonPath)
-    {
-        $this->assertEmpty((new JsonArray($this->response))->filterByJsonPath($jsonPath),
-            "Received JSON did (but should not) match the JsonPath provided\n".$this->response);
     }
 
     /**

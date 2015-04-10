@@ -9,7 +9,7 @@ function countChar(val, max, min, colorok, colorerror, divname) {
 	} else if(len < min) {
 		$('#' + divname).text('Số ký tự không thể ít hơn ' + min + ' ký tự').css({'color' : colorerror});
 	} else {
-		$('#' + divname).text('Số ký tự có thể nhập thêm: ' + (max - len) + ' ký tự').css({'color' : colorok});
+		$('#' + divname).text('Số ký tự hiện tại ' + len + '. Số ký tự có thể nhập thêm: ' + (max - len) + ' ký tự').css({'color' : colorok});
 	}
 }
 
@@ -23,11 +23,11 @@ function countWords(val, max, min, colorok, colorerror, divname){
 	var len = s.split(' ').length; 
 
 	if (len > max) {
-		$('#' + divname).text('Bạn đã nhập quá số từ cho phép. Chỉ được nhập tối đa ' + max + ' từ').css({'color' : colorerror});
+		$('#' + divname).text('Bạn đã nhập quá số từ cho phép là : ' + len + ' từ . Chỉ được nhập tối đa ' + max + ' từ').css({'color' : colorerror});
 	} else if(len < min) {
-		$('#' + divname).text('Số từ không thể ít hơn ' + min + ' từ').css({'color' : colorerror});
+		$('#' + divname).text('Bạn đã nhập : ' + len + ' từ. Số từ nhập không thể ít hơn ' + min + ' từ').css({'color' : colorerror});
 	} else {
-		$('#' + divname).text('Số từ có thể nhập thêm: ' + (max - len) + ' từ').css({'color' : colorok});
+		$('#' + divname).text('Số từ đã nhập : ' + len + ' từ. Số từ có thể nhập thêm: ' + (max - len) + ' từ').css({'color' : colorok});
 	}
 }
 

@@ -3,7 +3,6 @@
 abstract class AbstractEloquentRepository
 {
     protected $model;
-    protected $auth;
     protected $user;
     
     /**
@@ -119,16 +118,30 @@ abstract class AbstractEloquentRepository
 
     public function delete($ids)
     {
-        $this->model->destroy($ids);
+        return $this->model->destroy($ids);
     }
 
     /**
-    * Get current user login permission
+    * Get all permission of current user login
     */
-    public function getPermission()
+    public function getPermissions()
     {
         if ($this->user->actor_no) {
             return explode(',', $this->user->actor_no);
+        }
+
+        return false;
+    }
+
+     /**
+    * Get one permission of current user login
+    */
+    public function getPermission($index = 0)
+    {
+        $permissions = $this->getPermissions();
+        if (is_array($permissions)) {
+
+            return $permissions[$index];
         }
 
         return false;
@@ -139,22 +152,25 @@ abstract class AbstractEloquentRepository
     **/
     public function hasPermission($actor_id)
     {
-        $current_user_actor = $this->getPermission();
+        $current_user_actor = $this->getPermissions();
 
         return in_array($actor_id, $current_user_actor);
     }
 
-    // public function __call($method, $parameters)
-    // {
-    //     if (in_array($method, array('increment', 'decrement')))
-    //     {
-    //         return call_user_func_array(array($this, $method), $parameters);
-    //     }
+    /**
+    * check if current user  has one of some given actor permission
+    **/
+    public function hasPermissions($actor_ids = array())
+    {
+        $current_user_actor = $this->getPermissions();
 
-    //     $query = $this->model->newQuery();
+        foreach ($actor_ids as $actor_id) {
+            if (in_array($actor_id, $current_user_actor)) {
 
-    //     //dd($query);
-
-    //     return call_user_func_array(array($query, $method), $parameters);
-    // }
+                return true;
+            }
+        }
+        
+        return false;
+    }
 }

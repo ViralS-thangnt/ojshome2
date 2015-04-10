@@ -33,5 +33,43 @@ class EloquentUserRepository extends AbstractEloquentRepository implements UserI
 
         $user->fill($data);
         $user->save();
+
+        return $user;
     }
+
+    public function getListIds($actor, $none_value = false)
+    {
+        $users = $this->model->actor($actor)->select('id', 'first_name', 'last_name', 'middle_name')->get();
+
+        $list = $none_value ? array(null => '-') : array();
+        foreach ($users as $user) {
+            $list[$user->id] = $user->full_name;
+        }
+
+        return $list;
+    }
+
+    public function getByIds($ids)
+    {
+        if ($ids) {
+            $ids = explode(',', $ids);
+
+            $data = $this->model->select('id', 'first_name', 'middle_name', 'last_name')
+                    ->whereIn('id', $ids)->get();
+
+            if (!is_object($data)) {
+                return null;
+            }
+
+            $result = [];
+            foreach ($data as $value) {
+                $result[] = $value->full_name;
+            }
+
+            return $result;
+        }
+
+        return null;
+    }
+
 }

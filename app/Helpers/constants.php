@@ -21,16 +21,6 @@ define('CHIEF_EDITOR', 7);
 define('COPY_EDITOR', 8);
 define('LAYOUT_EDITOR', 9);
 define('PRODUCTION_EDITOR', 10);
-//define actor sortname
-define('AUTHOR_SN', 'au');
-define('MANAGING_EDITOR_SN', 'me');
-define('SCREENING_EDITOR_SN', 'sce');
-define('SECTION_EDITOR_SN', 'se');
-define('REVIEWER_SN', 'rv');
-define('CHIEF_EDITOR_SN', 'ce');
-define('COPY_EDITOR_SN', 'cpe');
-define('LAYOUT_EDITOR_SN', 'le');
-define('PRODUCTION_EDITOR_SN', 'pe');
 //define manuscript type
 define('A', 1);
 define('B', 2);
@@ -58,11 +48,18 @@ define('IN_EDITING', 3);
 define('REJECTED', 4);
 define('WITHDRAWN', 5);
 define('PUBLISHED', 6);
-define('M_REVIEWER', 7);
-define('WAIT_REVIEW', 8);	// Chờ phản biện
+//manuscript review list
+define('WAIT_REVIEW', 8);		// Chờ phản biện
+define('REVIEWED', 9); 			//Da phan bien
 define('REJECTED_REVIEW',10);	//khong nhan phan bien
 
+
 define('ALL', 9);			// Tất cả các bản thảo
+define('IN_SCREENING_REFUSE', 10); //screening manuscript refused in screening stage
+define('IN_SCREENING_EDIT', 11); // manuscript need to edit
+define('IN_REVIEW_REFUSE', 12);
+define('IN_REVIEW_EDIT', 13);
+// define('RE_REVIEW', 14);         // manuscript need to review again
 
 //define editor stage
 define('SCREENING', 1);
@@ -70,6 +67,35 @@ define('REVIEWING', 2);
 define('EDITING', 3);
 define('PUBLISHING', 4);
 
+//define editor decide
+define('REFUSE', 1);
+define('ACCEPT', 2);
+define('REQUIRE_EDIT', 3);
+
+//define decide key
+define('NULL', 0);			//'-'
+define('REJECT', 4);
+define('PUBLISH', 5);
+define('NEED_EDIT_AGAIN', 6);
+define('RE_REVIEW', 7);
+
+define('REVIEW_ACCEPT', 8);
+define('REVIEW_REJECT', 9);
+define('REVIEW_NEED_EDIT_AGAIN', 10);
+define('REVIEW_RE_REVIEW', 11);
+
+// define notify chief key
+define('NOTIFIED', 2);
+define('NOT_NOTIFY', 1);
+
+//define file upload type
+define('AUTHOR_FILE', 1);
+define('REVIEWER_FILE', 2);
+define('SE_FILE', 3);
+define('REVISE_FILE', 4);
+define('LAYOUT_PRINT_FILE', 5);
+define('PRE_PRINT_FILE', 6);
+define('OFFICIAL_FILE', 7);
 
 // Define box icon 
 define('ICON_PEOPLE', 'ion-ios7-people');
@@ -119,15 +145,50 @@ define('IMAGE_PATH', '/images/');
 define('FILE_PATH', '/files');
 
 // File size
-define('FILE_SIZE_MAX', 70000000);
+define('FILE_SIZE_MAX', 7000000000);
 
 // File path final
 define('FILE_UPLOAD_SESSION', 'path_file_uploaded');
+define('FILE_UPLOAD_TYPE', 'file_type');
+define('FILE_UPLOAD_NAME', 'file_name');
+define('FILE_UPLOAD_TOTAL_PAGE', 'file_total_page');
+define('FILE_UPLOAD_EXTENSION', 'file_extension');
 
-//define decide
-// define('NULL', '-');
-// define('ACCEPT', 1);
-// define('ACCEPT', 1);
-// define('ACCEPT', 1);
-// define('ACCEPT', 1);
+
+// define report
+define('REPORT_REJECTED', 1);
+define('REPORT_SUBMITED', 2);
+define('REPORT_PUBLISH_IN_YEAR', 3);
+define('REPORT_REVIEW_LOOP', 4);
+define('REPORT_WITHDRAWN', 5);
+define('REPORT_RATIO_REJECT', 6);
+define('REPORT_PUBLISHED_DELINQUENT',7);	// Xuất bản không đúng hạn
+define('REPORT_JOURNAL_IN_YEAR', 8);
+define('REPORT_REVIEW_TIME', 9);
+
+// define keyword type
+define('EN', 1);
+define('VI', 2);
+
+// define('INNER_JOURNAL_NUMBER', \Lang::get('report.inner.journal_number'));
+// define('VI', 2);
+
+// choose manuscript file of copy editor or author
+define('COPY_MANUSCRIPT_FILE', false);
+define('NEW_MANUSCRIPT_FILE', true);
+
+// Trong giai chế bản hay không
+define('PRINT_OUT', 1);
+define('NOT_PRINT_OUT', 0);
+
+// file type
+define('FILE_TYPE_PRINT_OUT', 0);
+
+// Trong giai đoạn kiểm bông hay không
+define('PRE_PUBLIC', 1);
+define('NOT_PRE_PUBLIC', 0);
+
+// Bắt đầu giai đoạn xuất bản, layout editor kích hoạt giai đoạn xuất bản
+define('START_PUBLISH', 1);
+
 

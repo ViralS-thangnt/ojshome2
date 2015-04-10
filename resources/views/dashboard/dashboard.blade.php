@@ -49,10 +49,6 @@ Trang chủ
 
 @stop
 
-<!-- Left column -->
-@section('left-column')
-{!! getMenuItem($permissions) !!} 
-@stop
 
 <!-- Main content -->
 @section('content')

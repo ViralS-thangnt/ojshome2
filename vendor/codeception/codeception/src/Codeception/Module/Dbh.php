@@ -56,9 +56,7 @@ class Dbh extends \Codeception\Module implements \Codeception\Lib\Interfaces\Db
             "You can use your bootstrap file to assign the dbh:\n\n" .
             '\Codeception\Module\Dbh::$dbh = $dbh');
 
-        if(!self::$dbh->inTransaction()) {
-            self::$dbh->beginTransaction();
-        }
+        self::$dbh->beginTransaction();
     }
 
     public function _after(\Codeception\TestCase $test) {

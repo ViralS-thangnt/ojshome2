@@ -34,7 +34,8 @@ return [
     'edit'						=>	'Sửa',
     'delete'					=>	'Xoá',
     'emptyData'					=>	'Không có bản ghi phù hợp nào được tìm thấy',
-
+    'detail'					=>  'Chi tiết',
+    
     //message
     'FailedLoginMessage'		=>	'Tài khoản đăng nhập không tồn tại!',
 
@@ -66,6 +67,7 @@ return [
 	'manuscript.create.title_policy'		=>	'Tôi đã đọc và đồng ý với các điều khoản và chính sách của ban biên tập',
 	'manuscript.create.policy_yes'			=>	'Đồng ý',
 	'manuscript.create.policy_no'			=>	'Không đồng ý',
+	'manuscript.create.placeholder.policy_content'	=>	'English Đây là nội dung và điều khoản của ban biên tập',
 
 	'manuscript.create.help.name'						=>	'(Nhập tên bài viết. Tối đa 20 từ)',
 	'manuscript.create.help.summary_vi'					=>	'(Nhập tóm tắt Tiếng Việt. Độ dài từ 150 - 200 từ)',
@@ -140,4 +142,76 @@ return [
 	'EditingStage' 				=>	'Biên tập',
 	'PublishingStage'			=>	'Xuất bản',
 	'round'						=>	'Vòng',
+
+	//journal
+
+	'jounal.create'						=> 'Thêm tạp chí',
+	'jounal.all'						=> 'Danh sách tạp chí',
+	'journal.title' 					=> 'Tạp chí',
+	'journal.journal_info'				=> 'Thông tin tạp chí',
+	'journal.create.detail.header'		=> 'Chi tiết',
+	'journal.create.name'				=> 'Tên tạp chí',
+	'journal.create.help.name'			=>	'(Nhập tên tạp chí. Tối thiểu 2 từ khoá)',
+	'journal.create.placeholder.name'   => '(Nhập tên tạp chí. Tối thiểu 2 từ khoá)',
+	'journal.create.num'			    => 'Số tạp chí',
+	'journal.create.help.num'           => '(Nhập số tạp chí)',
+	'journal.create.placeholder.num'    => '(Nhập số tạp chí, chỉ được nhập số)',
+	'journal.create.upload.header' 		=>	'Tải lên ảnh bìa',
+	'journal.create.publish'			=> 'Ngày đăng tạp chí',
+	'journal.create.help.publish'		=> '(Ngày đăng tạp chí)',
+	'journal.create.expect_publish'		=> 'Ngày đăng tạp chí( thực tế)',
+	'journal.create.help.expect_publish'=> 'Cập nhật ngày đăng tạp chí(Thực tế)',
+
+	//validate journal
+	'journal.name.required'				=> 'Bạn phải nhập tên tạp chí',
+	'journal.name.min'					=> 'Độ dài tên tạp chí phải lớn hơn 2 từ',
+	'journal.num.required'				=> 'Bạn phải nhập số tạp chí',
+	'journal.num.numeric'				=> 'Số tạp chí: Chỉ được nhập ký tự là chữ số',
+	'journal.publish_at.required'		=> 'Bạn phải nhập ngày đăng tạp chí (dự kiến)',
+	'journal.cover.image'				=> 'Ảnh bìa phải có định dạng jpeg, png, bmp, hoặc gif',
+
+
+	//keyword
+	'keyword.create'					=> 'Thêm keyword',
+	'keyword.all'						=> 'Danh sách Keyword',
+	'keyword.lang_code.required'		=> 'Bạn phải chọn ngôn ngữ cho keyword',
+	'keyword.text.required'				=> 'Bạn phải nhập keyword',
+	'keyword.title'						=> 'Keyword',
+	'keyword.keyword_info'				=> 'Thông tin keyword',
+	'keyword.create.navigation.keyword' => 'List keyword',
+	'keyword.create.navigation.create'	=> 'Create New Keyword',
+	'keyword.create.type'				=> 'Ngôn ngữ',
+	'keyword.create.name'  				=> 'Keyword',
+	'keyword.create.placeholder.name'	=> 'Keyword',
+
+	
+	//decide
+	'decide'			=>	'Quyết định',
+	'refuse'				=>	'Từ chối',
+	'accept'				=>	'Chấp nhận',
+	'requireEdit' 		=>	'Yêu cầu chỉnh sửa',
+	'reReview'				=>	'Gửi phản biện lại',
+
+	'ScreeningStage'	=>	'Sơ loại',
+	'ReviewingStage'	=>	'Bình duyệt',
+	'EditingStage'		=>	'Biên tập',
+	'PublishingStage'	=>	'Xuất bản',
+
+	'admin.editorComments' => 'Nhận xét',
+
+	'manuscript.info'	=>	'Thông tin bản thảo',
+	'manuscript.editor' =>	'Biên tập bản thảo',
+
+	'manuscript.assign'	=>	'Gán',
+
+	//thông báo
+	'manuscript.alertSelectScreeningEditor' => 'Hãy chọn biên tập viên sơ loại',
+
+	//button
+	'rejected'	=>	'Từ chối',
+
+	//title
+	'reviewed.reviewers.list' => 'Danh sách Nhà phản biện đã phản biện',
+	'reject.reviewers.list' => 'Danh sách nhà phản biện từ ',
+
 ];

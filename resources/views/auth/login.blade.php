@@ -1,7 +1,7 @@
 @extends('layout.bg-black.bg_black')
 
 @section('page-title')
-Register
+Login
 @stop
 
 @section('title')

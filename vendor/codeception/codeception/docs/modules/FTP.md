@@ -60,7 +60,6 @@ For SFTP, add [phpseclib](http://phpseclib.sourceforge.net/) to require list.
              timeout: 120
              user: 'root'
              password: 'root'
-             key: ~/.ssh/id_rsa
              tmp: 'tests/_data/ftp'
              passive: true
              cleanup: false
@@ -77,7 +76,6 @@ For SFTP, add [phpseclib](http://phpseclib.sourceforge.net/) to require list.
              timeout: 120
              user: 'root'
              password: 'root'
-             'key' => '',
              tmp: 'tests/_data/ftp'
              cleanup: false
 
@@ -85,11 +83,72 @@ For SFTP, add [phpseclib](http://phpseclib.sourceforge.net/) to require list.
 This module extends the Filesystem module, file contents methods are inherited from this module.
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### amInPath
  
 Enters a directory on the ftp system - FTP root directory is used by default
 
  * `param` $path
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ### cleanDir
@@ -111,6 +170,8 @@ Currently not supported in this module, overwrite inherited method
 
  * `param` $src
  * `param` $dst
+
+
 
 
 ### deleteDir
@@ -173,6 +234,9 @@ $I->dontSeeInThisFile('codeception/codeception');
 ```
 
  * `param` $text
+
+
+
 
 
 ### grabDirectory
@@ -248,6 +312,7 @@ $size = $I->grabFileSize('test.txt');
 @return bool
 
 
+
 ### loginAs
  
 Change the logged in user mid-way through your test, this closes the
@@ -278,6 +343,7 @@ $I->makeDir('vendor');
 ```
 
  * `param` $dirname
+
 
 
 ### openFile
@@ -322,6 +388,7 @@ $I->renameFile('composer.lock', 'composer_old.lock');
 
  * `param` $filename
  * `param` $rename
+
 
 
 ### seeFileContentsEqual
@@ -387,6 +454,7 @@ $I->seeInThisFile('codeception/codeception');
  * `param` $text
 
 
+
 ### writeToFile
  
 Saves contents to tmp file and uploads the FTP/SFTP system.
@@ -400,5 +468,4 @@ $I->writeToFile('composer.json', 'some data here');
 
  * `param` $filename
  * `param` $contents
-
 <p>&nbsp;</p><div class="alert alert-warning">Module reference is taken from the source code. <a href="https://github.com/Codeception/Codeception/tree/2.0/src/Codeception/Module/FTP.php">Help us to improve documentation. Edit module reference</a></div>

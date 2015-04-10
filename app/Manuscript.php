@@ -13,20 +13,28 @@ class Manuscript extends Model
 
     protected $table    = 'manuscripts';
     protected $fillable = ['author_id', 
+
+                            'editor_id',
+                            'section_editor_id',
+                            'layout_editor_id',
+                            'invite_reviewer_ids',
+                            'reject_reviewer_ids',
+                            'reviewer_ids',
+                            'deadline_at',
+                            'delivery_at',
+                            'current_editor_manuscript_id',
                             'author_comments', 
                             'type', 
                             'expect_journal_id', 
                             'publish_journal_id',
+                            'pre_journal_id',
                             'name', 
                             'summary_vi', 
-                            'keyword_vi', 
                             'summary_en', 
-                            'keyword_en', 
                             'topic', 
                             'recommend', 
                             'propose_reviewer',
                             'co_author', 
-                            'file', 
                             'is_chief_review', 
                             'chief_decide', 
                             'is_revise', 
@@ -34,14 +42,19 @@ class Manuscript extends Model
                             'is_pre_public', 
                             'status', 
                             'num_page',  
-                            'file_final',
                             'section_loop',
                             'review_loop',
                             'screen_loop', 
                             'send_at'];
     protected $guarded  = ['id'];
+
+    public function keywordManuscripts()
+    {
+        return $this->hasMany('App\KeywordManuscript', 'manuscript_id', 'id');
+    }
+
     //========================QUAN DT============================/
-    protected $appends = ['revise', 'print_out', 'pre_public'];
+    protected $appends = ['revise', 'print_out', 'pre_public', 'process', 'chief_decide_text'];
 
     public function getReviseAttribute()
     {
@@ -57,6 +70,18 @@ class Manuscript extends Model
     {
         return getCheckIcon($this->attributes['is_pre_public']);
     }
+
+    public function getProcessAttribute()
+    {
+
+        return makeProcessNameById($this->attributes['current_editor_manuscript_id']);
+    } 
+
+    public function getChiefDecideTextAttribute()
+    {
+
+        return Constant::$chief_decide[$this->attributes['chief_decide']];
+    }  
     //========================QUAN DT============================/
 
     //Define Manuscript Relationship
@@ -86,17 +111,27 @@ class Manuscript extends Model
 
     public function editorManuscripts()
     {
-        return $this->hasMany('App\EditorManuscript', 'manuscript_id');
+        return $this->hasMany('App\EditorManuscript', 'manuscript_id', 'id');
     }
 
     public function editorManuscript()
     {
-        return $this->hasOne('App\EditorManuscript', 'id', 'current_editor_manuscript_id');
+        return $this->hasOne('App\EditorManuscript', 'current_id', 'current_editor_manuscript_id');
+    }
+
+    public function currentEditorManuscripts()
+    {
+        return $this->hasMany('App\EditorManuscript', 'current_id', 'current_editor_manuscript_id');   
+    }
+
+    public function reviewerManuscripts()
+    {
+        return $this->hasMany('App\EditorManuscript', 'current_id', 'current_editor_manuscript_id')->where();
     }
 
     public function manuscriptFiles()
     {
-        return $this->hasMany('App\ManuscriptFile', 'manuscript_id');
+        return $this->hasMany('App\ManuscriptFile', 'manuscript_id', 'id');
     }
 
     public function journalManuscriptPublish()
@@ -104,15 +139,19 @@ class Manuscript extends Model
         return $this->belongsTo('App\Journal', 'publish_journal_id');
     }
     
-    // public function ManuscriptFiles()
-    // {
-    //     return $this->hasMany('App\ManuscriptFile', 'id');
-    // }
-    
 
     //define scope
     public function scopeStatus($query, $status)
     {
+        if ($status == IN_SCREENING) {
+
+            return $query->whereIn('status', [IN_SCREENING, IN_SCREENING_EDIT]);
+        }
+
+        if ($status == IN_REVIEW) {
+
+            return $query->whereIn('status', [IN_REVIEW, IN_REVIEW_EDIT]);
+        }
 
         return $query->where('status', '=', $status);
     } 
@@ -141,13 +180,26 @@ class Manuscript extends Model
         return $query->where('manuscripts.author_id', '=', $user_id);
     }
 
-    //========================QUAN DT============================/
-    public function scopeActor($query, $actor, $id)
+    public function scopeActor($query, $actor, $id, $reviewer_list = false)
     {
         switch ($actor) {
             case AUTHOR:
                 return $query->where('manuscripts.author_id', $id);
+            case REVIEWER:
+                if ($reviewer_list == WAIT_REVIEW) {
+                    return $query->whereRaw('FIND_IN_SET(?, manuscripts.invite_reviewer_ids)', [$id]);    
+                }
+
+                if ($reviewer_list == REVIEWED) {
+                    return $query->whereRaw('FIND_IN_SET(?, manuscripts.reviewer_ids)', [$id]);
+                }
+
+                if ($reviewer_list == REJECTED_REVIEW) {
+                    return $query->whereRaw('FIND_IN_SET(?, manuscripts.reject_reviewer_ids)', [$id]);
+                }              
             case MANAGING_EDITOR:
+                return $query;
+            case CHIEF_EDITOR:
                 return $query;
             case SECTION_EDITOR:
                 return $query->where('manuscripts.section_editor_id', $id);
@@ -158,7 +210,6 @@ class Manuscript extends Model
                 return $query->where('manuscripts.editor_id', $id);
         }
     }
-    //========================QUAN DT============================/
 
     // author : Lanpt
     public function scopeCheckWhere($query, $pattern)
