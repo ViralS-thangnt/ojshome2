@@ -47,7 +47,7 @@ Form::macro('section', function($title, $comment, $decide, $anchor = false) {
 	$html .= '<h2 class="page-header"><a href="#'.$anchor.'">'.$title.'</a></h2>';
 	$html .= '<p class="lead">'.$comment.'</p>';
 	//dd(trans(Constant::$full_decide[$decide]));
-	$html .= '<b>'.trans(Constant::$full_decide[$decide]).'</b>';
+	$html .= '<b>'.trans(isset(Constant::$full_decide[$decide]) ? Constant::$full_decide[$decide] : '-').'</b>';
 	$html .= '</section>';
 
 	return $html;

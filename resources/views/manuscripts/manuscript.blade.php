@@ -79,16 +79,17 @@
 						<!-- Editors -->
 						<td class="center"><a href = "{{ url('admin/editor-manuscript/form/' . $row->id) }}"> {!! Lang::get('admin.manuscript.more_detail') !!} </a></td>
 					@else
-
 						<!-- Author -->
-						@if (isset($stage) and $stage == EDITING and $row->is_print_out == PRINT_OUT)
+						@if ((isset($stage) and $stage == EDITING and $row->is_print_out == PRINT_OUT) or
+								(isset($stage) and $stage == PUBLISHING))
 							<!-- has print out from layout editor -->
 							<td class="center"><a href = "{{ url('admin/editor-manuscript/form/' . $row->id) }}"> {!! Lang::get('admin.manuscript.more_detail') !!} </a></td>
 
-						@else (isset($stage) and $stage != EDITING and $row->is_print_out == NOT_PRINT_OUT)
+						@else 
 							<!-- else -->
 							<td class="center"><a href = "{{ url('admin/manuscript/form/' . $row->id) }}"> {!! Lang::get('admin.manuscript.more_detail') !!} </a></td>
 						
+
 						@endif
 						
 					@endif

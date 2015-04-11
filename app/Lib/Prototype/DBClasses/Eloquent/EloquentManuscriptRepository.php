@@ -276,7 +276,7 @@ class EloquentManuscriptRepository extends AbstractEloquentRepository implements
                 
                 break;
         }
-
+// dd($data);
         return $data;
     }
 
@@ -285,13 +285,20 @@ class EloquentManuscriptRepository extends AbstractEloquentRepository implements
         if ($this->hasPermission(MANAGING_EDITOR)) 
         {
             $data['screening_editors'] = $this->user_repo->getListIds(SCREENING_EDITOR);
-            // Get info screening editors by manuscript id and stage = IN_SCREENING
+            // Get info screening editors by manuscript id and stage = SCREENING
             $data['screening_editors_info'] = $this->getScreeningEditorByManuscriptAndStage($data['manuscript']->id, SCREENING);
         }
         else if($this->hasPermission(SCREENING_EDITOR))
         {
             //screening editor
             $data['reviewers'] = $this->user_repo->getListIds(REVIEWER);
+            // dd($data['manuscript']->id);
+            $editor_manu = EditorManuscript::where('manuscript_id', $data['manuscript']->id)
+                                                ->where('user_id', \Auth::user()->id)->get();
+                                                // dd(count($editor_manu));
+            count($editor_manu) != 0 ? $data['editorManuscript_id'] = \Auth::user()->id : '';
+            // $data['editorManuscript_id'] = \Auth::user()->id;
+            // dd($data, $this->user_repo, \Auth::user()->id);
         }
 
         return $data;
@@ -305,7 +312,7 @@ class EloquentManuscriptRepository extends AbstractEloquentRepository implements
             $data['section_editors'] = $this->user_repo->getListIds(SECTION_EDITOR);
             $data['reviewers'] = $this->user_repo->getListIds(REVIEWER);
 
-            // Get info screening editors by manuscript id and stage = IN_SCREENING
+            // Get info screening editors by manuscript id and stage = SCREENING
             $data['screening_editors_info'] = $this->getScreeningEditorByManuscriptAndStage($data['manuscript']->id, SCREENING);
             
         } 
@@ -406,9 +413,10 @@ class EloquentManuscriptRepository extends AbstractEloquentRepository implements
                                     ->where('type', $type)
                                     ->first();
                                     // dd($manu_file);
+
         if($manu_file)
         {
-            return $manu_file->id;
+            return ;
         }
 
         return null;
@@ -488,7 +496,7 @@ class EloquentManuscriptRepository extends AbstractEloquentRepository implements
     {
         // dump(Input::all());
         //         dd($data);
-
+        // dump($editor_manuscript_id);
         //reviewer reject review
         if (isset($data['rejected']) && $data['rejected']) {
             $this->updateReviewerList($id);
@@ -497,6 +505,7 @@ class EloquentManuscriptRepository extends AbstractEloquentRepository implements
         }
 
         $manuscript = $this->model->find($id);
+
         //check if current user still have assign permission
         if (!$this->checkAssignPermission($manuscript)) {
             return null;
@@ -516,28 +525,47 @@ class EloquentManuscriptRepository extends AbstractEloquentRepository implements
             $manu->current_editor_manuscript_id = $editor_manu->current_id;
             $manu->save();
 
-            // redirect()->back();
             return null;
         }
 
         //save comment and decide
         if ($editor_manuscript_id) {
-            $editor_manuscript = $this->editor_model->find($editor_manuscript_id);
+            // $editor_manuscript = $this->editor_model->find($editor_manuscript_id);
+            
+            $editor_manu_id = EditorManuscript::where('manuscript_id', $id)
+                                                    ->where('user_id', $editor_manuscript_id)
+                                                    ->first()->id;
+                                                    
+            $editor_manuscript = $this->editor_model->find($editor_manu_id);
+
+            // dump('old');
+            // dd($editor_manuscript);
         } else {
             $editor_manuscript = $this->editor_model;
+            // dump('new');
         }
-        isset($data['decide']) ? $data['decide'] = current($data['decide']) : ''; 
+
+        if($data['decide']) 
+        {
+            is_array($data['decide']) ? $data['decide'] = current($data['decide']) : ''; 
+        }
+
         $data['manuscript_id'] = $id;
         $data['user_id'] = $this->user->id;
         $editor_manuscript->fill($data);  
-        $editor_manuscript->save();
 
         // $data = $this->saveEditorManuscript($data, $id, $editor_manuscript_id);
 
-        if ($this->hasPermission(SCREENING_EDITOR)) {
-            $manuscript->status = IN_SCREENING;
-            $manuscript->save();
-        }
+        if ($this->hasPermission(SCREENING_EDITOR) and isset($data['is_sent']) and $data['is_sent'] != 1 ) {
+
+            $this->saveDraftScreeningEditor($id, $editor_manuscript, $manuscript);
+            
+            return null;
+
+        } 
+        
+        // dd($data, $editor_manuscript);
+        $editor_manuscript->save();
 
         if ($this->hasPermission(SECTION_EDITOR)) {
             $manuscript = $this->sectionEditorUploadFile($id, $manuscript, $data, $this->user->id);
@@ -561,6 +589,7 @@ class EloquentManuscriptRepository extends AbstractEloquentRepository implements
         if (isset($data['is_revise'])) {
             // Upload file hiệu đính
             $manuscript = $this->copyEditorUploadFileRevise($manuscript, $data, $this->user->id);
+
             return null;
         }
 
@@ -592,16 +621,52 @@ class EloquentManuscriptRepository extends AbstractEloquentRepository implements
         }
 
         $manuscript->save();
-        // dump($editor_manuscript);
-        // dd($data);
+
         if($data['is_sent'] == 1 and $data['decide'] == ACCEPT) 
         {
-            $editor_manuscript->stage = $stage++;
-            $editor_manuscript->save();
-        }
+            // Go to next stage
+            // Create Editor Manuscript
+            $editor_manu = new  EditorManuscript;
 
+            // Setup EditorManuscript
+            $editor_manuscript->stage = $stage++;
+dd($stage);
+            $current_id = makeCurrentId($id, $editor_manuscript->stage, 1);
+
+            $editor_manu->current_id = $current_id;
+            $editor_manu->loop = 1;
+            $editor_manu->is_sent = 0;
+            $editor_manu->manuscript_id = $manuscript->id;
+
+            $editor_manu->save();
+
+            //save manuscript with new current_id
+            $manuscript->current_editor_manuscript_id = $current_id;
+            $manuscript->save();
+        }
     }
 
+    public function saveDraftScreeningEditor($id, $editor_manuscript, $manuscript)
+    {
+        if(empty($editor_manuscript->current_editor_manuscript_id))
+        {
+            $editor_manuscript->loop = 1;
+            $editor_manuscript->stage = SCREENING;
+            $current_id = makeCurrentId($id, SCREENING, 1);
+        }
+        else
+        {
+            $current_id = makeCurrentId($id, SCREENING, $editor_manuscript->loop);
+        }
+
+        
+        $editor_manuscript->current_id = $current_id;
+        $editor_manuscript->save();
+        $manuscript->status = IN_SCREENING;
+        $manuscript->current_editor_manuscript_id = $current_id;
+
+        $manuscript->save();
+    }
 
     public function saveEditorManuscript($data, $id, $editor_manuscript_id)
     {
@@ -699,24 +764,24 @@ class EloquentManuscriptRepository extends AbstractEloquentRepository implements
     {
         // dd($this->user->id);
         // layout editor kích hoạt giai đoạn xuất bản
-            // Tranfer to PUBLISH
-            $manuscript->status = PUBLISHED;
+        // Tranfer to PUBLISH
+        $manuscript->status = PUBLISHED;
 
-            // Create new current_id
-            $manuscript->current_editor_manuscript_id = makeCurrentId($id, getStageByStatus($manuscript->status), 1);
-            
-            $manuscript->save();
+        // Create new current_id
+        $manuscript->current_editor_manuscript_id = makeCurrentId($id, getStageByStatus($manuscript->status), 1);
+        
+        $manuscript->save();
 
-            // Create new Editor Manuscript
-            $new = new EditorManuscript;
-            $new->current_id = $manuscript->current_editor_manuscript_id;
-            $new->stage = PUBLISHING;
-            $new->manuscript_id = $manuscript->id;
-            $new->user_id = \Auth::user()->id;
-            $new->loop = 1;
-            $new->save();
+        // Create new Editor Manuscript
+        $new = new EditorManuscript;
+        $new->current_id = $manuscript->current_editor_manuscript_id;
+        $new->stage = PUBLISHING;
+        $new->manuscript_id = $manuscript->id;
+        $new->user_id = \Auth::user()->id;
+        $new->loop = 1;
+        $new->save();
 
-            return $manuscript;
+        return $manuscript;
     }
 
 
@@ -893,6 +958,7 @@ class EloquentManuscriptRepository extends AbstractEloquentRepository implements
         $permissions = explode(',', $user->actor_no);
         
         $pattern    = ['status'=> $status];
+
          
         if(in_array(CHIEF_EDITOR, $permissions)|| in_array(MANAGING_EDITOR, $permissions)) {
             $col_header = Constant::$inRejected['col_header'];

@@ -98,7 +98,7 @@ class ManuscriptsController extends Controller {
 		if ($this->repo->hasPermissions(Constant::$require_permission[IN_EDITING])) {
 			$result = $this->repo->getColumnTable(IN_EDITING, $this->repo->getPermission());
 			$stage = getStageByStatus(IN_EDITING);
-
+			// dd($stage, $result);
 			return view('manuscripts.manuscript')->withResult($result)->withStage($stage);
 		}
 

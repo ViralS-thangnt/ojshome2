@@ -75,7 +75,7 @@
     </div>  <!-- end box-body -->
 </div>  <!-- end box-primary -->
 
-<input type="submit" value="Gui bai" />
+<input type="submit" value="Gửi bài" />
 
 @endif
 

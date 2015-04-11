@@ -114,7 +114,7 @@
         
             File PDF dưới dạng khuôn in đã upload lên</br></br>
             
-            <a href="#" onclick="javascript: return downloadFile();"> Download file bản thảo dưới dạng khuôn in</a>
+            <a href="#" onclick="javascript: return downloadFile();"> Download file bản thảo dưới dạng khuôn in PDF</a>
         
     </div>  <!-- end box-body -->
 </div>  <!-- end box-primary -->
@@ -130,6 +130,8 @@
     </div>  <!-- end box-body -->
 </div>  <!-- end box-primary -->
 
+
+<!-- Submit form sẽ bắt đầu giai đoạn PUBLISHING -->
 {!! Form::hidden('start_publish', START_PUBLISH) !!}
 
 {!! Form::button(trans('admin.manuscript.create.submit'), ['class' => 'send btn btn-primary', 'type' => 'submit']) !!}
