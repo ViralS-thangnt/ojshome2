@@ -31,6 +31,7 @@ class CreateUsersTable extends Migration {
 			$table->string('research_area')->nullable();
 			$table->string('research')->nullable();
 			$table->string('actor_no')->nullable();
+			$table->softDeletes();
 			$table->rememberToken();
 			$table->timestamps();
 		});

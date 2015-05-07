@@ -26,7 +26,7 @@ class EloquentKeywordRepository extends AbstractEloquentRepository implements Ke
         $col_db     = Constant::$keywordAll['col_db'];
    
         $keywords = Keyword::select($col)->get();
-
+        
         $keywords->each(function ($keyword){
             $keyword->lang_code = Constant::$keyword_type[$keyword->lang_code];
         });
@@ -47,5 +47,23 @@ class EloquentKeywordRepository extends AbstractEloquentRepository implements Ke
         $keyword->save();
         
         return $keyword;
+    }
+
+    public function deleteKeyword($id)
+    {   
+        // if(in_array(CHIEF_EDITOR, explode(',', $this->user->actor_no)))
+        // dd((string)CHIEF_EDITOR, strpos($this->user->actor_no, (string)CHIEF_EDITOR), $this->user->actor_no);
+        if(strpos($this->user->actor_no, (string)CHIEF_EDITOR) >= 0)
+        {
+            $this->model->withTrashed()->where('id', $id)->delete();
+
+            Session::flash(SUCCESS_MESSAGE, 'Delete keyword successfully');
+        }
+        else
+        {
+
+            return view('manuscripts.permission_denied')->withMessage('You can not access this site');
+        }
+
     }
 }

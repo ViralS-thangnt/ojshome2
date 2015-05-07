@@ -15,7 +15,7 @@ function doUpload($file, $path = IMAGE_PATH)
 }
 
 function doUploadDocument(){
-	// dd('upload');
+	// dump('upload');
 	// dd($_FILES);
 	$dir_file = str_random(9);
 
@@ -69,6 +69,7 @@ function doUploadDocument(){
 		}
 	}
 
+// dump('end upload', $uploadOk);
 	return $uploadOk;
 }
 
@@ -200,14 +201,17 @@ function getMenuItem($permissions)
 {
 	$html = '';
 	if (!empty($permissions)) {
+
 		foreach ($permissions as $permission) {
 			switch ($permission) {
 				case ADMIN:
 					$html .= Form::menu_item('Administrator', Constant::$admin_per);
+					$html .= Form::menu_item('Report', Constant::$report_menu, ICON_MENU_CHART);
 					break;
 				case AUTHOR:
 					$html .= Form::menu_item('Author', Constant::$author_per);
 					break;
+
 				case REVIEWER:
 					$html .= Form::menu_item('Reviewer', Constant::$reviewer_per);
 					break;  
@@ -232,6 +236,8 @@ function getMenuItem($permissions)
 			}
 		}
 	}
+	// dump($html);
+	// dd($permissions, ADMIN);
 
 	return $html;
 }
@@ -282,7 +288,7 @@ function makeCurrentId($manuscript_id, $stage, $loop)
 
 function makeProcessName($stage, $loop)
 {
-	if ($stage == EDITING) {
+	if ($stage == EDITING || $stage == PUBLISHING) {
         return trans(Constant::$stage[$stage]);
     } else {
         return trans(Constant::$stage[$stage]).' '.trans('admin.round').' '.$loop;
@@ -335,4 +341,32 @@ function findInSet($value, $set)
 function getCheckIcon($boolean)
 {
 	return $boolean ? '<i class="fa fa-check"></i>' : '-'; 
+}
+
+//get a specifict manuscript file from file collection by file type
+function getFileByType($files, $type)
+{
+    if (!$files->isEmpty()) {
+
+        return $files->whereLoose('type', $type)->last();
+    } 
+
+    return false;      
+}
+
+function replaceSymbolString($string, $old, $new)
+{
+	dump($string, $old, $new);
+	$string = str_replace($old, $new, $string);
+
+	return $string;
+}
+
+function replaceArraySymbolString($string, $array)
+{
+	foreach ($array as $value) {
+		$string = replaceSymbolString($string, $value, $value . ' ');
+	}
+
+	return $string;
 }

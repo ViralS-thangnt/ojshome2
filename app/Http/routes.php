@@ -9,7 +9,7 @@
 | It's a breeze. Simply tell Laravel the URIs it should respond to
 | and give it the controller to call when that URI is requested.
 |
-*/
+*/http://ojs.app/admin/editor-manuscript/form/259
 //Homepage
 Route::get('/', 'WelcomeController@index');
 Route::get('home', 'HomeController@index');
@@ -17,16 +17,30 @@ Route::get('book', 'BooksController@index');
 //User management
 Route::get('admin/user/form/{id?}', 'Admin\UsersController@form');
 Route::post('admin/user/form/{id?}', ['uses' => 'Admin\UsersController@update', 'as' => 'user.update']);
-Route::resource('admin/user', 'Admin\UsersController', ['except' => ['create', 'edit', 'store', 'show', 'update', 'destroy']]);
-Route::get('admin/user/{id?}', ['uses' => 'Admin\UsersController@destroy', 'as' => 'user.destroy']);
+Route::resource('admin/user', 'Admin\UsersController', ['except' => ['create', 'edit', 'store', 'show', 'update']]);
+// Route::get('admin/user/destroy/{id}', ['uses' => 'Admin\UsersController@destroy', 'as' => 'user.destroy']);
 
-Route::resource('admin/journal', 'JournalsController', ['except' => ['create', 'edit', 'store', 'show', 'update']]);
+//Journal management
+//Route::resource('admin/journal', 'JournalsController', ['except' => ['create', 'edit', 'store', 'show', 'update']]);
 Route::get('admin/journal/form/{id?}' , 'JournalsController@form');
 Route::post('admin/journal/form/{id?}', ['uses' => 'JournalsController@update', 'as' =>'journal.update']);
+Route::get('admin/journal/{id}/position/{ms_id}/{order?}', 'JournalsController@position');
+Route::get('admin/journal/{id}/{ms_id}/remove', 'JournalsController@removeManuscript');
+Route::get('admin/journal/{id}/{ms_id}/add', 'JournalsController@addManuscript');
+Route::get('admin/journal', ['as' =>'journal.all', 'uses' => 'JournalsController@index' ]);
 
+
+Route::get('admin/journal/unpublish', ['as' =>'journal.unpublish', 'uses' => 'JournalsController@unpublish']);
+Route::get('admin/journal/published', ['as' =>'journal.published', 'uses' => 'JournalsController@published']);
+
+Route::get('admin/journal/{id}/detail', ['as' =>'journal.detail', 'uses' => 'JournalsController@show']);
+Route::get('admin/journal/destroy/{id}', ['as' =>'journal.destroy', 'uses' => 'JournalsController@destroy']);
+
+// Keyword
 Route::resource('admin/keyword', 'KeywordsController', ['except' => ['create', 'edit', 'store', 'show', ' update']]);
 Route::get('admin/keyword/form/{id?}', 'KeywordsController@form');
 Route::post('admin/keyword/form/{id?}', ['uses' => 'KeywordsController@update', 'as' =>'keyword.update']);
+
 //Authenticate User
 Route::controllers([
     'user' => 'Auth\AuthController',
@@ -44,7 +58,7 @@ Route::get('admin/setLocale', ['as'    =>  'admin.setLocale', 'uses'   =>  'Admi
 //Manuscript Links
 Route::get(Constant::$url['manuscript.form'], ['as'  =>  'manuscript.form', 'uses'   =>  'Admin\ManuscriptsController@form']);
 Route::post(Constant::$url['manuscript.update'], ['as' =>  'manuscript.update', 'uses'  =>  'Admin\ManuscriptsController@update']);
-Route::post(Constant::$url['manuscript.insert'], ['as' =>  'manuscript.insert', 'uses'  =>  'Admin\ManuscriptsController@update']);
+Route::post(Constant::$url['manuscript.insert'], ['as' =>  'manuscript.insert', 'uses'  =>  'Admin\ManuscriptsController@insert']);
 Route::post(Constant::$url['manuscript.withdrawn'] . '/{id}', ['as' =>  'manuscript.withdrawn', 'uses'  =>  'Admin\ManuscriptsController@withdrawnManuscript']);
 
 Route::get(Constant::$url['unsubmit'],    ['uses' => 'Admin\ManuscriptsController@unsubmit']);
@@ -58,35 +72,37 @@ Route::get(Constant::$url['reviewed'],  ['uses' => 'Admin\ManuscriptsController@
 Route::get(Constant::$url['wait-review'],  ['uses' => 'Admin\ManuscriptsController@waitReview']);
 Route::get(Constant::$url['rejected-review'], ['uses' => 'Admin\ManuscriptsController@rejectedReview']);
 Route::get(Constant::$url['all'],  ['uses' => 'Admin\ManuscriptsController@all']);
-Route::get(Constant::$url['report-rejected'],  ['uses' => 'Admin\ManuscriptsController@showReportRejected']);
+
 Route::get(Constant::$url['get_all'],  ['uses' => 'Admin\ManuscriptsController@getall']);
 Route::post(Constant::$url['get_all'],  ['uses' => 'Admin\ManuscriptsController@SoftDeletes']);
 
-Route::post(Constant::$url['report-rejected'], ['uses'	=>	'Admin\ManuscriptsController@showReportRejected']);
+Route::get(Constant::$url['report-rejected'],  ['uses' => 'Admin\ReportsController@showReportRejected']);
+Route::post(Constant::$url['report-rejected'], ['uses'	=>	'Admin\ReportsController@showReportRejected']);
 
-Route::get(Constant::$url['report-submited'],  ['uses' => 'Admin\ManuscriptsController@showReportSubmited']);
-Route::post(Constant::$url['report-submited'],  ['uses' => 'Admin\ManuscriptsController@showReportSubmited']);
+Route::get(Constant::$url['report-submited'],  ['uses' => 'Admin\ReportsController@showReportSubmited']);
+Route::post(Constant::$url['report-submited'],  ['uses' => 'Admin\ReportsController@showReportSubmited']);
 
-Route::get(Constant::$url['report-publish-in-year'],  ['uses' => 'Admin\ManuscriptsController@showReportPublishInYear']);
-Route::post(Constant::$url['report-publish-in-year'],  ['uses' => 'Admin\ManuscriptsController@showReportPublishInYear']);
+Route::get(Constant::$url['report-publish-in-year'],  ['uses' => 'Admin\ReportsController@showReportPublishInYear']);
+Route::post(Constant::$url['report-publish-in-year'],  ['uses' => 'Admin\ReportsController@showReportPublishInYear']);
 
-Route::get(Constant::$url['report-review-loop'],  ['uses' => 'Admin\ManuscriptsController@showReportReviewLoop']);
-Route::post(Constant::$url['report-review-loop'],  ['uses' => 'Admin\ManuscriptsController@showReportReviewLoop']);
+Route::get(Constant::$url['report-review-loop'],  ['uses' => 'Admin\ReportsController@showReportReviewLoop']);
+Route::post(Constant::$url['report-review-loop'],  ['uses' => 'Admin\ReportsController@showReportReviewLoop']);
 
-Route::get(Constant::$url['report-withdrawn'],  ['uses' => 'Admin\ManuscriptsController@showReportWithdrawn']);
-Route::post(Constant::$url['report-withdrawn'],  ['uses' => 'Admin\ManuscriptsController@showReportWithdrawn']);
+Route::get(Constant::$url['report-withdrawn'],  ['uses' => 'Admin\ReportsController@showReportWithdrawn']);
+Route::post(Constant::$url['report-withdrawn'],  ['uses' => 'Admin\ReportsController@showReportWithdrawn']);
 
-Route::get(Constant::$url['report-ratio-reject'],  ['uses' => 'Admin\ManuscriptsController@showReportRatioReject']);
-Route::post(Constant::$url['report-ratio-reject'],  ['uses' => 'Admin\ManuscriptsController@showReportRatioReject']);
+Route::get(Constant::$url['report-ratio-reject'],  ['uses' => 'Admin\ReportsController@showReportRatioReject']);
+Route::post(Constant::$url['report-ratio-reject'],  ['uses' => 'Admin\ReportsController@showReportRatioReject']);
 
-Route::get(Constant::$url['report-published-delinquent'],  ['uses' => 'Admin\ManuscriptsController@showReportPublishedDelinquent']);
-Route::post(Constant::$url['report-published-delinquent'],  ['uses' => 'Admin\ManuscriptsController@showReportPublishedDelinquent']);
+Route::get(Constant::$url['report-published-delinquent'],  ['uses' => 'Admin\ReportsController@showReportPublishedDelinquent']);
+Route::post(Constant::$url['report-published-delinquent'],  ['uses' => 'Admin\ReportsController@showReportPublishedDelinquent']);
 
-Route::get(Constant::$url['report-journal-in-year'],  ['uses' => 'Admin\ManuscriptsController@showReportJournalInYear']);
-Route::post(Constant::$url['report-journal-in-year'],  ['uses' => 'Admin\ManuscriptsController@showReportJournalInYear']);
+Route::get(Constant::$url['report-journal-in-year'],  ['uses' => 'Admin\ReportsController@showReportJournalInYear']);
+Route::post(Constant::$url['report-journal-in-year'],  ['uses' => 'Admin\ReportsController@showReportJournalInYear']);
 
-Route::get(Constant::$url['report-review-time'],  ['uses' => 'Admin\ManuscriptsController@showReportReviewTime']);
-Route::post(Constant::$url['report-review-time'],  ['uses' => 'Admin\ManuscriptsController@showReportReviewTime']);
+Route::get(Constant::$url['report-review-time'],  ['uses' => 'Admin\ReportsController@showReportReviewTime']);
+Route::post(Constant::$url['report-review-time'],  ['uses' => 'Admin\ReportsController@showReportReviewTime']);
+
 Route::get(Constant::$url['editor.manuscript.form'], ['uses' => 'Admin\EditorManuscriptsController@form']);
 
 Route::post(Constant::$url['editor.manuscript.form'], ['uses' => 'Admin\EditorManuscriptsController@update', 'as' => 'editor.manuscript.update']);

@@ -21,6 +21,9 @@ define('CHIEF_EDITOR', 7);
 define('COPY_EDITOR', 8);
 define('LAYOUT_EDITOR', 9);
 define('PRODUCTION_EDITOR', 10);
+
+define('JOURNALIST', 11);
+
 //define manuscript type
 define('A', 1);
 define('B', 2);
@@ -54,11 +57,12 @@ define('REVIEWED', 9); 			//Da phan bien
 define('REJECTED_REVIEW',10);	//khong nhan phan bien
 
 
-define('ALL', 9);			// Tất cả các bản thảo
-define('IN_SCREENING_REFUSE', 10); //screening manuscript refused in screening stage
-define('IN_SCREENING_EDIT', 11); // manuscript need to edit
-define('IN_REVIEW_REFUSE', 12);
-define('IN_REVIEW_EDIT', 13);
+define('ALL', 11);			// Tất cả các bản thảo
+define('IN_SCREENING_REFUSE', 12); //screening manuscript refused in screening stage
+define('IN_SCREENING_EDIT', 13); // manuscript need to edit
+define('IN_REVIEW_REFUSE', 14);
+define('IN_REVIEW_EDIT', 15);
+
 // define('RE_REVIEW', 14);         // manuscript need to review again
 
 //define editor stage
@@ -191,4 +195,8 @@ define('NOT_PRE_PUBLIC', 0);
 // Bắt đầu giai đoạn xuất bản, layout editor kích hoạt giai đoạn xuất bản
 define('START_PUBLISH', 1);
 
+// 
+define('DRAFT_MANUSCRIPT', 0);
+define('SAVE_MANUSCRIPT', 1);
 
+define('SYMBOL_CHARACTER', ')');

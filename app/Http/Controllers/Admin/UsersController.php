@@ -1,6 +1,7 @@
 <?php namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\UserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\Http\Controllers\Controller;
 use App\Lib\Prototype\Interfaces\UserInterface;
 use Illuminate\Support\Facades\Session;
@@ -48,7 +49,7 @@ class UsersController extends Controller
      * @param  int  $id
      * @return Response
      */
-    public function update(UserRequest $request, $id = null)
+    public function update(UpdateUserRequest $request, $id = null)
     {
         $this->userRepo->formModify(Input::all(), $id);
 
@@ -63,8 +64,7 @@ class UsersController extends Controller
      */
     public function destroy($id)
     {
-        $this->userRepo->delete($id);
-        Session::flash(SUCCESS_MESSAGE, 'Delete user successfully');
+        $this->userRepo->deleteUser($id);
 
         return redirect('admin/user');
     }

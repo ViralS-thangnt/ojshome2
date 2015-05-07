@@ -45,14 +45,14 @@ class DataManuscriptSeeder extends Seeder
         {
             $arrManuscript[] = [
                 'author_id'                    => $faker->randomElement($author_ids),
-                'editor_id'                    => '',
-                'section_editor_id'            => '',
-                'layout_editor_id'             => '',
+                'editor_id'                    => 0,
+                'section_editor_id'            => 0,
+                'layout_editor_id'             => 0,
                 'author_comments'              => 'author_comments manuscript' . $i,
                 'type'                         => $faker->randomElement($type),
                 'expect_journal_id'            => $faker->randomElement($journal_ids),
-                'publish_journal_id'           => '',
-                'pre_journal_id'               => '',
+                'publish_journal_id'           => 0,
+                'pre_journal_id'               => 0,
                 'name'                         => 'Manuscript '. $i,
                 'summary_vi'                   => 'summary_vi ' . $i,
                 'summary_en'                   => 'summary_en ' . $i,
@@ -66,7 +66,6 @@ class DataManuscriptSeeder extends Seeder
                 'is_print_out'                 => 0,
                 'is_pre_public'                => 0,
                 'status'                       => UNSUBMIT,
-                'send_at'                      => '',
                 ];
         }
         DB::table("manuscripts")->insert($arrManuscript);
@@ -122,8 +121,8 @@ class DataManuscriptSeeder extends Seeder
                         'manuscript_id' => $i,
                         'user_id'       => $tmp ,
                         'loop'          => $loop,
-                        'delivery_at'   => '4/4/2015',
-                        'deadline_at'   => '6/4/2015',
+                        'delivery_at'   => '2015-04-29',
+                        'deadline_at'   => '2015-05-05',
                         'current_id'    => $i . '_'. $stage .'_1',
                         ] ;
 
@@ -131,6 +130,7 @@ class DataManuscriptSeeder extends Seeder
 
             $manuscript = Manuscript::find($i);
             $manuscript->status = $status;
+            $manuscript->editor_id = $tmp;
             $manuscript->current_editor_manuscript_id  = $i . '_'. $stage .'_1';
             $manuscript->save();
                      
@@ -244,7 +244,6 @@ class DataManuscriptSeeder extends Seeder
             $manuscript->current_editor_manuscript_id   = $i . '_'. $stage .'_1';
             $manuscript->save();
        }
-        
 
 
 

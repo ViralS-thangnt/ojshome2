@@ -13,7 +13,6 @@ class Manuscript extends Model
 
     protected $table    = 'manuscripts';
     protected $fillable = ['author_id', 
-
                             'editor_id',
                             'section_editor_id',
                             'layout_editor_id',
@@ -45,7 +44,9 @@ class Manuscript extends Model
                             'section_loop',
                             'review_loop',
                             'screen_loop', 
-                            'send_at'];
+                            'send_at',
+                            'file_version',
+                            ];
     protected $guarded  = ['id'];
 
     public function keywordManuscripts()
@@ -79,8 +80,9 @@ class Manuscript extends Model
 
     public function getChiefDecideTextAttribute()
     {
+        return $this->attributes['chief_decide'];
 
-        return Constant::$chief_decide[$this->attributes['chief_decide']];
+        return Constant::$full_decide[$this->attributes['chief_decide']];
     }  
     //========================QUAN DT============================/
 

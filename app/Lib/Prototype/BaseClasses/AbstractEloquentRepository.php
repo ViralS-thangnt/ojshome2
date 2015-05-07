@@ -1,5 +1,7 @@
 <?php namespace App\Lib\Prototype\BaseClasses;
 
+use Constant;
+
 abstract class AbstractEloquentRepository
 {
     protected $model;

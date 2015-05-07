@@ -20,6 +20,7 @@ class CreateManuscriptsTable extends Migration {
 			$table->integer('editor_id')->nullable();
 			$table->integer('section_editor_id')->nullable();
 			$table->integer('layout_editor_id')->nullable();
+			$table->tinyInteger('file_version')->nullable();
 			$table->string('invite_reviewer_ids')->nullable();
 			$table->string('reviewer_ids')->nullable();
 			$table->string('reject_reviewer_ids')->nullable();
@@ -45,6 +46,7 @@ class CreateManuscriptsTable extends Migration {
 			$table->boolean('is_pre_public')->nullable();
 			$table->tinyInteger('status');
 			$table->dateTime('send_at')->nullable();
+			$table->integer('order')->nullable();
 			$table->softDeletes();
 			$table->timestamps();
 		});

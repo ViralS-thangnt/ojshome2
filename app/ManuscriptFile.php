@@ -13,6 +13,12 @@ class ManuscriptFile extends Model
     protected $table    = 'manuscript_files';
     protected $fillable = ['manuscript_id', 'user_id', 'name', 'type', 'total_page', 'extension'];
     protected $guarded  = ['id'];
+    protected $appends  = ['file_info'];
+
+    public function getFileInfoAttribute()
+    {
+        return strtoupper($this->attributes['extension']).' | '.$this->attributes['total_page'].'p';
+    }
 
     public function manuscript()
     {
@@ -24,6 +30,11 @@ class ManuscriptFile extends Model
     {
   
         return $this->belongsTo('App\User', 'user_id', 'id');
+    }
+
+    public function scopeOfTypes($query, $types = array())
+    {
+        return $query->whereIn('type', $types);
     }
 
 }

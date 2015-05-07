@@ -16,4 +16,9 @@ class Journal extends Model
     						'expect_publish_at',
     						];
     protected $guarded  = ['id'];
+
+    public function manuscripts()
+    {
+        return $this->hasMany('App\Manuscript', 'pre_journal_id');
+    }
 }

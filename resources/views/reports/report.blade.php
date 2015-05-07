@@ -52,7 +52,7 @@
 <div id="line-example"></div>
 
     <div id="temp"></div>
-	<script type="text/javascript">
+	<script type="text/javascript" charset="utf-8">
 		// DatePicker
 		$('#sandbox-container .input-daterange').datepicker({
 			format: "dd/mm/yyyy",
@@ -71,7 +71,9 @@
 	        var reviewTitle = '@include("reports.var-review-title")';
 	        var screenVal = '@include("reports.screen")';
 	        var reviewVal = '@include("reports.review")';
+	        // alert(toUnicode(title));
 	        // alert(count);
+
 	        //DONUT CHART
 			var donut = new Morris.Donut({
 				element: 'revenue-chart',

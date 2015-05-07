@@ -39,36 +39,24 @@ class ManuscriptsController extends Controller {
 	}
 
 	public function inScreening()
-	{		
-		$permissions = explode(',', $this->user->actor_no);
+	{			
+		if ($this->repo->hasPermissions(Constant::$require_permission[IN_SCREENING])) {
+			$result = $this->repo->getColumnTable(IN_SCREENING, $this->user->actor_no);
 
-		if(in_array(AUTHOR, $permissions)|| in_array(CHIEF_EDITOR, $permissions)|| in_array(SCREENING_EDITOR, $permissions)|| in_array(MANAGING_EDITOR, $permissions))
-		{
-			$result = $this->repo->getByStatus(IN_SCREENING);
-
-			return view('manuscripts.manuscript')->withResult($result)->with(['permissions'	=> $this->repo->getPermission()]);
+			return view('manuscripts.manuscript')->withResult($result);
 		}
-		else {
 
-			return view('manuscripts.permission_denied')->withMessage('You can not access this site');
-		}
-		
+		return view('manuscripts.permission_denied')->withMessage('You can not access this site');
 	}
 
 	public function rejected()
 	{
-		$permissions = explode(',', $this->user->actor_no);
+		if ($this->repo->hasPermissions(Constant::$require_permission[REJECTED])) {
 
-		if(in_array(AUTHOR, $permissions)|| in_array(CHIEF_EDITOR, $permissions)|| in_array(SECTION_EDITOR, $permissions)|| in_array(MANAGING_EDITOR, $permissions))
-		{
-			$result = $this->repo->getByStatus(REJECTED);
-
-			return view('manuscripts.manuscript')->withResult($result)->with(['permissions'	=> $this->repo->getPermission()]);
+			return view('manuscripts.manuscript')->withResult($this->repo->getDataRefuse());
 		}
-		else {
 
-			return view('manuscripts.permission_denied')->withMessage('You can not access this site');
-		}
+		return view('manuscripts.permission_denied')->withMessage('You can not access this site');
 	}
 
 	public function rejectedReview()
@@ -98,7 +86,7 @@ class ManuscriptsController extends Controller {
 		if ($this->repo->hasPermissions(Constant::$require_permission[IN_EDITING])) {
 			$result = $this->repo->getColumnTable(IN_EDITING, $this->repo->getPermission());
 			$stage = getStageByStatus(IN_EDITING);
-			// dd($stage, $result);
+
 			return view('manuscripts.manuscript')->withResult($result)->withStage($stage);
 		}
 
@@ -107,9 +95,16 @@ class ManuscriptsController extends Controller {
 
 	public function published()
 	{	
-		$result = $this->repo->getByStatus(PUBLISHED);
+		if ($this->repo->hasPermissions(array(LAYOUT_EDITOR, CHIEF_EDITOR, AUTHOR, MANAGING_EDITOR, SECTION_EDITOR, COPY_EDITOR))) {
+			$result = $this->repo->getColumnTable(PUBLISHED, $this->repo->getPermission());
+			if ($this->repo->hasPermission(CHIEF_EDITOR)) {
+				$result['view'] = 'manuscripts.editors.includes.publishing.chief';	
+			}
 
-		return view('manuscripts.manuscript')->withResult($result)->with(['permissions'	=> $this->repo->getPermission()]);
+			return view('manuscripts.manuscript')->withResult($result);
+		}
+		
+		return view('manuscripts.permission_denied')->withMessage('You can not access this site');
 	}
 
 
@@ -149,114 +144,12 @@ class ManuscriptsController extends Controller {
 		return view('manuscripts.manuscript')->withResult($result)->with(['permissions'	=> $this->repo->getPermission()]);
 	}
 
-	// Reports
-	public function showReportRejected()
-	{
-		$data = $this->repo->getDataReport(Input::get('start'), Input::get('end'), REPORT_REJECTED);
-
-		return view('reports.report')
-					->withData($data)
-					->withUrl(Constant::$url['report-rejected'])
-					->withReport(Constant::$report[REPORT_REJECTED])
-					->withPermissions(array($this->repo->getPermission()));
-	}
-
-	public function showReportSubmited()
-	{
-		$data = $this->repo->getDataReport(Input::get('start'), Input::get('end'), REPORT_SUBMITED);
-
-		return view('reports.report')
-					->withData($data)
-					->withUrl(Constant::$url['report-submited'])
-					->withReport(Constant::$report[REPORT_SUBMITED])
-					->withPermissions(array($this->repo->getPermission()));
-	}
-
-	public function showReportPublishInYear()
-	{
-		$data = $this->repo->getDataReport(Input::get('start'), Input::get('end'), REPORT_PUBLISH_IN_YEAR);
-
-		return view('reports.report')
-					->withData($data)
-					->withUrl(Constant::$url['report-publish-in-year'])
-					->withReport(Constant::$report[REPORT_PUBLISH_IN_YEAR])
-					->withPermissions(array($this->repo->getPermission()));
-	}
-
-	public function showReportReviewLoop()
-	{
-		$data = $this->repo->getDataReport(Input::get('start'), Input::get('end'), REPORT_REVIEW_LOOP);
-
-		return view('reports.report')
-					->withData($data)
-					->withUrl(Constant::$url['report-review-loop'])
-					->withReport(Constant::$report[REPORT_REVIEW_LOOP])
-					->withPermissions(array($this->repo->getPermission()));
-	}
-
-	public function showReportWithdrawn()
-	{
-		$data = $this->repo->getDataReport(Input::get('start'), Input::get('end'), REPORT_WITHDRAWN);
-
-		return view('reports.report')
-					->withData($data)
-					->withUrl(Constant::$url['report-withdrawn'])
-					->withReport(Constant::$report[REPORT_WITHDRAWN])
-					->withPermissions(array($this->repo->getPermission()));
-	}
-	
-	public function showReportRatioReject()
-	{
-		$data = $this->repo->getDataReport(Input::get('start'), Input::get('end'), REPORT_RATIO_REJECT);
-
-		return view('reports.report')
-					->withData(['start' => $data['start'], 'end' => $data['end'], 'count_manu' => $data['count_manu']['data']])
-					->withUrl(Constant::$url['report-ratio-reject'])
-					->withReport(Constant::$report[REPORT_RATIO_REJECT])
-					->withScreen($data['count_manu']['screen'])
-					->withReview($data['count_manu']['review'])
-					->withPermissions(array($this->repo->getPermission()));
-	}
-
-	public function showReportPublishedDelinquent()
-	{
-		// dd('report-published-delinquent');
-		$data = $this->repo->getDataReport(Input::get('start'), Input::get('end'), REPORT_PUBLISHED_DELINQUENT);
-
-		return view('reports.report')
-					->withData($data)
-					->withUrl(Constant::$url['report-published-delinquent'])
-					->withReport(Constant::$report[REPORT_PUBLISHED_DELINQUENT])
-					->withPermissions(array($this->repo->getPermission()));
-	}
-
-	public function showReportJournalInYear()
-	{
-		$data = $this->repo->getDataReport(Input::get('start'), Input::get('end'), REPORT_JOURNAL_IN_YEAR);
-
-		return view('reports.report')
-					->withData($data)
-					->withUrl(Constant::$url['report-journal-in-year'])
-					->withReport(Constant::$report[REPORT_JOURNAL_IN_YEAR])
-					->withPermissions(array($this->repo->getPermission()));
-	}
-
-	public function showReportReviewTime()
-	{
-		// dd('report-review-time');
-		$data = $this->repo->getDataReport(Input::get('start'), Input::get('end'), REPORT_REVIEW_TIME);
-
-		return view('reports.report')
-					->withData($data)
-					->withUrl(Constant::$url['report-review-time'])
-					->withReport(Constant::$report[REPORT_REVIEW_TIME])
-					->withPermissions(array($this->repo->getPermission()));
-	}
 
 
 	public function getall()
 	{	
-		$result = $this->repo->getAll();
+		$result = $this->repo->getByStatus(ALL);
+
 		return view('manuscripts.manuscript_admin')->withResult($result);
 	}
 	public function SoftDeletes()
@@ -269,31 +162,8 @@ class ManuscriptsController extends Controller {
 			}
 		}
 		$this->repo->ManuscriptSoftDeletes($checkbox_name);
+
 		return redirect()->back();
-	}
-
-	public function getDataCombobox($field, $value, $key_field_name, $value_field_name)
-	{
-		$temp = Keyword::where($field, '=', $value)->get();
-
-		$id_arr = $temp->lists($key_field_name);
-		$values_arr = $temp->lists($value_field_name);
-
-		return array_combine($id_arr, $values_arr);
-	}
-
-	public function getDataComboboxSelected($id, $lang_code)
-	{
-		$temp = KeywordManuscript::where('manuscript_id', '=', $id)
-								->with('keyword')
-								->whereHas('keyword', function($q) use($lang_code)
-								{
-									$q->where('lang_code', $lang_code);
-								})
-								->get()
-								->lists('keyword_id')
-								;
-		return $temp;
 	}
 
 	/**
@@ -305,59 +175,20 @@ class ManuscriptsController extends Controller {
 	public function form($id = null)
 	{
 		// Not author, can't access
-		if(!$this->repo->hasPermission(AUTHOR))
-		{
-			abort(333);
-		}
-
-		$keyword_en_selected = null;
-		$keyword_vi_selected = null;
-		$disabled = false;		// edit or disable control
-		$is_new = true;			// new or edit manuscript 
-		$need_edit = false;		// need edit again ?
-		$is_withdrawn = false;	// withdrawn ?
-		$reject_status = REJECTED;	// reject status 
-		// $stage = null;
+		$this->repo->checkIsAuthor();
 
 		if($id) 
 		{
-			$manuscripts = $this->repo->getById($id);
-
-			// if user hasn't permission
-			($this->user->id != $manuscripts->author_id) ? abort(333) : '' ;
-			
-			// Get data for keyword combobox 
-			$manuscripts = $this->repo->restoreStatusListbox($manuscripts);
-			$keyword_en_selected = $this->getDataComboboxSelected($id, EN);
-			$keyword_vi_selected = $this->getDataComboboxSelected($id, VI);
-
-			if($manuscripts) 
-			{
-				$is_new = false;
-				($manuscripts->status == WITHDRAWN) ? $is_withdrawn = true : '';
-				($manuscripts->status == IN_SCREENING_EDIT || $manuscripts->status == IN_REVIEW_EDIT) ? $need_edit = true : '';
-				// dd($manuscripts->status, IN_REVIEWING_EDIT, IN_SCREENING_EDIT);
-			} 
-			else
-			{
-				$manuscripts = $this->repo;
-			}
-			
-			$disabled = $this->repo->checkDisabledEditManuscript($manuscripts);
-
+			$data = $this->repo->getDataFormEditManuscript($id, $this->repo->getById($id));
 		} 
 		else 
 		{
-			$manuscripts = $this->repo;
+			$data = $this->repo->getDataFormNewManuscript($this->repo);
 		}
 
-		$keyword_en = $this->getDataCombobox('lang_code', EN , 'id', 'text');
-		$keyword_vi = $this->getDataCombobox('lang_code', VI, 'id', 'text');
-
-		return view('manuscripts.form', compact('manuscripts', 'id', 'keyword_en', 'keyword_vi', 'disabled', 'is_new', 'need_edit', 'is_withdrawn'))
-					->with('keyword_en_selected', $keyword_en_selected)
-					->with('keyword_vi_selected', $keyword_vi_selected)
-					;
+		return view('manuscripts.form', compact('id'))
+					->with($data)
+					->with($this->repo->getDataKeyword());
 	}
 
 	/**
@@ -368,11 +199,16 @@ class ManuscriptsController extends Controller {
 	 */
 	public function update(ManuscriptRequest $request, $id = null)
 	{	
-		// dd(Input::all());
-
 		$this->repo->uploadFile();
 		$this->repo->formModify(Input::except('_token', 'confirm'), $id);
-		// $this->repo->checkSaveAjax(Input::except('_token', 'confirm'), $id);
+
+		return redirect('/admin');
+	}
+
+	public function insert(ManuscriptRequest $request)
+	{
+		$this->repo->uploadFile();
+		$this->repo->formModify(Input::except('_token', 'confirm'), $id);
 
 		return redirect('/admin');
 	}
@@ -400,7 +236,6 @@ class ManuscriptsController extends Controller {
 
 	public function downloadFileEditor($manu_file_id)
 	{
-		// dd($manu_file_id);
 		// check auth
 		if($this->repo->hasPermissions([CHIEF_EDITOR, SECTION_EDITOR, MANAGING_EDITOR, AUTHOR, COPY_EDITOR, SCREENING_EDITOR, REVIEWER, LAYOUT_EDITOR]))
 		{

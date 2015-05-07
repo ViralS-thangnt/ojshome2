@@ -72,7 +72,7 @@
 							<td class="center" > {{ empty($row->$col) ? '-' : $row->$col }} </td>
 					@endforeach
 					
-					<td class="center"><a href = "{{ url(Constant::$author_per['admin.manuscript.create'] . '/' . $row->id) }}"> {!! Lang::get('admin.manuscript.more_detail') !!} </a></td>
+					<td class="center"><a href = "{{ url('admin/editor-manuscript/form/' . $row->id) }}"> {!! Lang::get('admin.manuscript.more_detail') !!} </a></td>
 				</tr>
 
 			@endforeach

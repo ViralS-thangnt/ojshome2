@@ -25,7 +25,7 @@ class JournalRequest extends Request
         return [
             'name'              =>  'required|min:2',
             'num'               =>  'required|numeric',
-            'publish_at'        =>  'required',
+            'expect_publish_at' =>  'required',
             'cover'             =>  'image'
         ];
     }
@@ -37,7 +37,7 @@ class JournalRequest extends Request
             'name.min'                  => trans('admin.journal.name.min'),
             'num.required'              => trans('admin.journal.num.required'),
             'num.numeric'               => trans('admin.journal.num.numeric'),
-            'publish_at.required'       => trans('admin.journal.publish_at.required'),
+            'expect_publish_at.required'       => trans('admin.journal.publish_at.required'),
             'cover.image'               => trans('admin.journal.cover.image')
         ];
     }

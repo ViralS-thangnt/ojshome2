@@ -29,15 +29,19 @@ class KeywordsController extends Controller {
 	public function index()
 	{
 		$permissions = explode(',', $this->user->actor_no);
-		if(in_array(ADMIN, $permissions))
+		if(in_array(CHIEF_EDITOR, $permissions))
 		{
 			$keywords = $this->keyword->getAll();
-			return view('keywords.index', compact('keywords'))->with(['permissions' => $this->keyword->getPermission()]);
+			
+			// dd($keywords);
+			// dd($this->keyword->getPermission());
+			// dd(explode(',', $this->user->actor_no));
+
+			return view('keywords.index', compact('keywords'))->with(['permissions' => explode(',', $this->user->actor_no)]);
 		}
-		else
-		{
-			return view('manuscripts.permission_denied')->withMessage('You can not access this site');
-		}
+		
+		return view('manuscripts.permission_denied')->withMessage('You can not access this site');
+
 	}
 
 	public function form($id=null)
@@ -55,9 +59,10 @@ class KeywordsController extends Controller {
 
 		}
 
-		if(in_array(ADMIN, $permissions))
+		if(in_array(CHIEF_EDITOR, $permissions))
 		{
-			return view('keywords.form', compact('keyword', 'id'))->with(['permissions' => $this->keyword->getPermission()]);
+
+			return view('keywords.form', compact('keyword', 'id'))->with(['permissions' => $permissions]);
 
 		} else {
 
@@ -74,6 +79,7 @@ class KeywordsController extends Controller {
 	public function update(KeywordRequest $request, $id=null)
 	{
 		$this->keyword->formModify(Input::all(), $id);
+
 		return redirect('admin/keyword');
 	}
 
@@ -85,9 +91,10 @@ class KeywordsController extends Controller {
 	 */
 	public function destroy($id)
 	{
-		$this->keyword->delete($id);
+		// $this->keyword->delete($id);
+  		// Session::flash(SUCCESS_MESSAGE, 'Delete journal successfully');
 
-        Session::flash(SUCCESS_MESSAGE, 'Delete journal successfully');
+		$this->keyword->deleteKeyword($id);
 
         return redirect('admin/keyword');
 	}

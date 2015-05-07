@@ -2,8 +2,7 @@
 
 @section('editor')
 @if (!$rejected_user)
-    {!! Form::model($manuscript->editorManuscript, ['route' => ['editor.manuscript.update-editor', $manuscript->id, $editorManuscript_id], 
-    'id' => 'form-editor-manuscript', 'files' => true, 'enctype' => 'multipart/form-data']) !!}
+    {!! Form::model($manuscript->editorManuscript, ['route' => ['editor.manuscript.update-editor', $manuscript->id, $editorManuscript_id], 'files' => true]) !!}
     {!! Form::editor(trans('admin.reviewerComments'), 'comments', $disable_edit) !!}
     @if (!$disable_edit)
     {!! Form::file('file') !!}

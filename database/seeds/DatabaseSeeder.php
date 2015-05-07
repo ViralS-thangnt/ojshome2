@@ -19,10 +19,9 @@ class DatabaseSeeder extends Seeder
     {
         Model::unguard();
 
-        $this->call('UserTableSeeder');
-        //$this->call('DataManuscriptSeeder');
+        //$this->call('UserTableSeeder');
         //$this->call('JournalSeeder');
-        
+        $this->call('MiniDataManuscriptSeeder');        
     }
 }
 
@@ -90,5 +89,7 @@ class UserTableSeeder extends Seeder
             }      
         }
         DB::table("users")->insert($arrUser);
+
+        DB::table('manuscripts')->delete();
     }
 }

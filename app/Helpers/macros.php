@@ -31,6 +31,25 @@ Form::macro('output_text', function($label, $content) {
 	return $html;
 });
 
+Form::macro('input_file', function($name, $label, $help_block = '') {
+	$html = '<div class="form-group">';
+	$html .= Form::label($name, $label, ['class' => 'text-form-large']);
+	$html .= '<p class="help-block-custom ">'.$help_block.'</p>';
+	$html .= Form::file($name);
+	$html .= '</div>';
+
+	return $html;
+});
+
+Form::macro('output_file', function($name, $url, $label, $download = 'download') {
+	$html = '<div class="form-group">';
+	$html .= Form::label($name, $label, ['class' => 'text-form-large']);
+	$html .= '<br /><a href="'.$url.'" '.$download.'>'.$name.'</a>';
+	$html .= '</div>';
+
+	return $html;
+});
+
 Form::macro('output_list', function($title, $list = array()) {
 	$html = '<h3>'.$title.'</h3><ul>';
 	foreach ($list as $value) {
@@ -41,13 +60,16 @@ Form::macro('output_list', function($title, $list = array()) {
 	return $html;
 });
 
-Form::macro('section', function($title, $comment, $decide, $anchor = false) {
+Form::macro('section', function($title, $comment, $decide = false, $anchor = false) {
 	$anchor = $anchor ? $anchor : '';
 	$html = '<section id="">';
 	$html .= '<h2 class="page-header"><a href="#'.$anchor.'">'.$title.'</a></h2>';
-	$html .= '<p class="lead">'.$comment.'</p>';
+	$html .= '<div class="lead">'.$comment.'</div>';
 	//dd(trans(Constant::$full_decide[$decide]));
-	$html .= '<b>'.trans(isset(Constant::$full_decide[$decide]) ? Constant::$full_decide[$decide] : '-').'</b>';
+	if ($decide !== false) {
+		$html .= '<b>'.trans(isset(Constant::$full_decide[$decide]) ? Constant::$full_decide[$decide] : '-').'</b>';
+	}
+	
 	$html .= '</section>';
 
 	return $html;
@@ -363,7 +385,7 @@ Form::macro('ul_custom', function($data = [''],
 									$new_notify_number = array(),
 									$ul_class = '', 
 									$li_class = ''){
-	
+
 	$result = '<ul class="' . $ul_class . '">';
 	$count_links = count($links);
 	$count = count($data);
@@ -376,7 +398,7 @@ Form::macro('ul_custom', function($data = [''],
 	
 	for($i = 0; $i < $count; $i++)
 		if($count_links >= $i)
-			$result = $result . '<li class="' . $li_class . '"><a href="' . $links[$i] . '">' . $data[$i] . '</a></li>';
+			$result = $result . '<li class="' . $li_class . '"><a href="' . url($links[$i]) . '">' . trans($data[$i]) . '</a></li>';
 
 	$result = $result . '</ul';
 

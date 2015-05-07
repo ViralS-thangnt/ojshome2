@@ -156,6 +156,8 @@ return [
         'App\Providers\JournalServiceProvider',
         'App\Providers\KeywordServiceProvider',
         'App\Providers\ComposerServiceProvider',
+
+        'App\Providers\ReportServiceProvider',
     ],
 
     /*

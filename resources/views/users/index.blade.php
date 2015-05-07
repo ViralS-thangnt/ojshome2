@@ -8,6 +8,22 @@
 
 <!-- Main content -->
 @section('content')
+<form method="post" id="form-delete">
+    <input type="hidden" name="_method" value="DELETE" />
+    <input type="hidden" name="_token" value="{{ csrf_token() }}" />
+</form>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('a.delete').click(function(){
+            if (confirm('Are you sure you want to delete this user ?')) {
+                $('#form-delete').attr('action', $(this).attr('href')).submit();    
+            }
+
+            return false;
+        });
+    })
+</script>
+
 <a href="{!! url('admin/user/form') !!}">Create new user</a>
 <table class="table">
 <thead>
@@ -26,8 +42,8 @@
         <td>{{$user->email}}</td>
         <td>{{actor($user->actor_no)}}</td>
         @if($user->actor_no != ADMIN)
-        <td><a href="{!! url('admin/user/form/'. $user->id) !!}">Edit</a></td>
-        <td><a href="{!! url('admin/user/'. $user->id) !!}" class="delete">Delete</a></td>
+        <td><a href="{!! url('admin/user/form/'. $user->id) !!}">{!! trans('admin.edit') !!}</a></td>
+        <td><a href="{!! url('admin/user/'. $user->id) !!}" class="delete">{!! trans('admin.delete') !!}</a></td>
         @else
         <td></td>
         <td></td>
@@ -36,19 +52,5 @@
     @endforeach
 </tbody>
 </table>
-<form method="post" id="form-delete">
-<input type="hidden" name="_method" value="DELETE" />
-<input type="hidden" name="_token" value="{{ csrf_token() }}" />
-</form>
-<script type="text/javascript">
-    $(document).ready(function(){
-        $('a.delete').click(function(){
-            if (confirm('Are you sure you want to delete this user ?')) {
-                $('#form-delete').attr('action', $(this).attr('href')).submit();    
-            }
 
-            return false;
-        });
-    })
-</script>
 @stop

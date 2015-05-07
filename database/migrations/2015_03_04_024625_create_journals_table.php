@@ -18,7 +18,7 @@ class CreateJournalsTable extends Migration {
 			$table->string('name');
 			$table->integer('num');
 			$table->string('cover');
-			$table->dateTime('publish_at');
+			$table->dateTime('publish_at')->nullable();
 			$table->dateTime('expect_publish_at')->nullable();
 			$table->timestamp('deleted_at')->nullable();
 			$table->timestamps();

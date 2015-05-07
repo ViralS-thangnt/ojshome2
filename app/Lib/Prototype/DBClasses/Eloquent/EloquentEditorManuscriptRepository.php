@@ -27,4 +27,17 @@ class EloquentEditorManuscriptRepository extends AbstractEloquentRepository impl
 
         return $editor_manuscript;
     }
+
+    public function getCommentsByEditorIds($current_id, $user_ids)
+    {
+        $query = $this->model->where('current_id', $current_id);
+
+        if (is_array($user_ids)) {
+            
+            return $query->whereIn('user_id', $user_ids)->get();
+        } else {
+
+            return $query->where('user_id', $user_ids)->first();
+        }
+    }
 }

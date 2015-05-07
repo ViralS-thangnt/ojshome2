@@ -27,7 +27,21 @@
 @stop
 
 @section('content')
-    
+<form method="post" id="form-delete">
+    <input type="hidden" name="_method" value="DELETE" />
+    <input type="hidden" name="_token" value="{{ csrf_token() }}" />
+</form>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('a.delete').click(function(){
+            if (confirm('Are you sure you want to delete this keyword ?')) {
+                $('#form-delete').attr('action', $(this).attr('href')).submit();    
+            }
+
+            return false;
+        });
+    })
+</script>
 <script type="text/javascript">
     $(function() {
         $('#table_data').dataTable({
@@ -63,7 +77,7 @@
                 @foreach($keywords['col_header'] as $head)
                      <th class="sorting_asc center" role="columnheader" tabindex="0" aria-controls="table_data" rowspan="1" colspan="1">{{trans($head)}}</th>
                 @endforeach
-               <th rowspan="1" colspan="1" class="center">{!! trans('admin.edit') !!}</th>
+                <th rowspan="1" colspan="1" class="center">{!! trans('admin.edit') !!}</th>
                 <th rowspan="1" colspan="1" class="center">{!! trans('admin.delete') !!}</th>
             </tr>
         </tfoot>
@@ -77,9 +91,8 @@
                             <td class="center" > {!! empty($row->$col) ? '-' : $row->$col !!} </td>
                     @endforeach
                     
-               {{--      <td class="center"><a href = "{{ url(Constant::$author_per['admin.manuscript.create'] . '/' . $row->id) }}"> {!! Lang::get('admin.manuscript.more_detail') !!} </a></td> --}}
                     <td class="center"><a href ="{!! url('admin/keyword/form/'. $row->id) !!}">{!! trans('admin.edit') !!}</a></td>
-                    <td class="center"><a href ="{!!url('admin/keyword/'. $row->id) !!}" class="delete">{!! trans('admin.delete') !!}</a></td>
+                    <td class="center"><a href ="{!! url('admin/keyword/'. $row->id) !!}" class="delete">{!! trans('admin.delete') !!}</a></td>
                 </tr>
 
             @endforeach
@@ -91,20 +104,6 @@
 
 </div><!-- /.box-body -->
 </div>
-<form method="post" id="form-delete">
-<input type="hidden" name="_method" value="DELETE" />
-<input type="hidden" name="_token" value="{{ csrf_token() }}" />
-</form>
-<script type="text/javascript">
-    $(document).ready(function(){
-        $('a.delete').click(function(){
-            if (confirm('Are you sure you want to delete this user ?')) {
-                $('#form-delete').attr('action', $(this).attr('href')).submit();    
-            }
 
-            return false;
-        });
-    })
-</script>
 
 @stop

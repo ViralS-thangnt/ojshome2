@@ -29,19 +29,89 @@ class JournalsController extends Controller {
 	 */
 	public function index()
 	{
-		$permissions = explode(',', $this->user->actor_no);
-
-		if(in_array(ADMIN, $permissions)|| in_array(CHIEF_EDITOR, $permissions))
+		if($this->journal->hasPermission(CHIEF_EDITOR))
 		{
 			$journals = $this->journal->getAll();
 
-			return view('journals.index', compact('journals'))->with(['permissions'	=> $this->journal->getPermission()]);
+			return view('journals.index', compact('journals'));
 		}
-		else
+
+		return view('manuscripts.permission_denied')->withMessage('You can not access this site');
+	}
+
+	//Display listing of unpublish journals
+	public function unpublish()
+	{
+		if($this->journal->hasPermission(CHIEF_EDITOR))
 		{
-			return view('manuscripts.permission_denied')->withMessage('You can not access this site');
+			$journals = $this->journal->getUnpublish();
+
+			return view('journals.index', compact('journals'));
 		}
-		
+
+		return view('manuscripts.permission_denied')->withMessage('You can not access this site');
+	}
+
+	//Display listing of published journals
+	public function published()
+	{
+		if($this->journal->hasPermission(CHIEF_EDITOR))
+		{
+			$journals = $this->journal->getPublished();
+
+			return view('journals.index', compact('journals'));
+		}
+
+		return view('manuscripts.permission_denied')->withMessage('You can not access this site');
+	}
+
+	public function show($id)
+	{
+		if ($this->journal->hasPermission(CHIEF_EDITOR)) {
+			$journal = $this->journal->getManuscriptsById($id);
+			$manuscripts = $this->journal->getUnOrderManuscript();
+
+			return view('journals.detail', compact('journal', 'manuscripts', 'id'));
+		}
+
+		return view('manuscripts.permission_denied')->withMessage('You can not access this site');
+
+	}
+
+	//Reorder manuscript in journal
+	public function position($id, $manuscript_id, $order = 'up')
+	{
+		if ($this->journal->hasPermission(CHIEF_EDITOR)) {
+			$order = ($order == 'up') ? $order : 'down';
+			$this->journal->orderManuscript($id, $manuscript_id, $order);
+			
+			return redirect('admin/journal/'.$id.'/detail');
+		}
+
+		return 'chim cut';
+	}
+
+	//Remove manuscript from journal
+	public function removeManuscript($id, $manuscript_id)
+	{
+		if ($this->journal->hasPermission(CHIEF_EDITOR)) {
+			$this->journal->removeManuscript($id, $manuscript_id);
+
+			return redirect('admin/journal/'.$id.'/detail');
+		}
+
+		return 'chim cut';
+	}
+
+	public function addManuscript($id, $manuscript_id)
+	{
+		if ($this->journal->hasPermission(CHIEF_EDITOR)) {
+			$this->journal->addManuscript($id, $manuscript_id);
+
+			return redirect('admin/journal/'.$id.'/detail');
+		}
+
+		return 'chim cut';
 	}
 
 	/**
@@ -63,7 +133,8 @@ class JournalsController extends Controller {
 
         }
 
-        if(in_array(ADMIN, $permissions)|| in_array(CHIEF_EDITOR, $permissions))
+        // if(in_array(ADMIN, $permissions)|| in_array(CHIEF_EDITOR, $permissions))
+        if(in_array(CHIEF_EDITOR, $permissions))
 		{
 
         	return view('journals.form', compact('journal', 'id'))->with(['permissions'	=> $this->journal->getPermission()]);
@@ -95,11 +166,14 @@ class JournalsController extends Controller {
 	 */
 	public function destroy($id)
 	{
-		$this->journal->delete($id);
-
-        Session::flash(SUCCESS_MESSAGE, 'Delete journal successfully');
+		$this->journal->deleteJournal($id);
 
         return redirect('admin/journal');
 	}
+
+	// public function destroy1()
+	// {
+	// 	dd('ok');
+	// }
 
 }

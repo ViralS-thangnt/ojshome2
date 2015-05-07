@@ -75,24 +75,7 @@
 						<td class="center" > {!! empty($row->$col) ? '-' : $row->$col !!} </td>
 					@endforeach
 
-					@if (!in_array(AUTHOR, $permissions))
-						<!-- Editors -->
-						<td class="center"><a href = "{{ url('admin/editor-manuscript/form/' . $row->id) }}"> {!! Lang::get('admin.manuscript.more_detail') !!} </a></td>
-					@else
-						<!-- Author -->
-						@if ((isset($stage) and $stage == EDITING and $row->is_print_out == PRINT_OUT) or
-								(isset($stage) and $stage == PUBLISHING))
-							<!-- has print out from layout editor -->
-							<td class="center"><a href = "{{ url('admin/editor-manuscript/form/' . $row->id) }}"> {!! Lang::get('admin.manuscript.more_detail') !!} </a></td>
-
-						@else 
-							<!-- else -->
-							<td class="center"><a href = "{{ url('admin/manuscript/form/' . $row->id) }}"> {!! Lang::get('admin.manuscript.more_detail') !!} </a></td>
-						
-
-						@endif
-						
-					@endif
+					<td class="center"><a href = "{{ url('admin/editor-manuscript/form/' . $row->id) }}"> {!! Lang::get('admin.manuscript.more_detail') !!} </a></td>
 				</tr>
 
 			@endforeach
@@ -101,6 +84,10 @@
 		</table>
 
 	</div><!-- datatable_wrapper -->
+
+	@if (isset($result['view']))
+	@include($result['view'])
+	@endif
 
 </div><!-- /.box-body -->
 </div>

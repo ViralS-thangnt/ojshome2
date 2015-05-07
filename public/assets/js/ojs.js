@@ -17,9 +17,9 @@ function countChar(val, max, min, colorok, colorerror, divname) {
 function countWords(val, max, min, colorok, colorerror, divname){         
 	// s = document.getElementById(val).value;         
 	s = val.value;
-	s = s.replace(/(^\s*)|(\s*$)/gi,"");         
-	s = s.replace(/[ ]{2,}/gi," ");         
-	s = s.replace(/\n /,"\n");         
+	// s = s.replace(/(^\s*)|(\s*$)/gi,"");         
+	// s = s.replace(/[ ]{2,}/gi," ");         
+	// s = s.replace(/\n /,"\n");         
 	var len = s.split(' ').length; 
 
 	if (len > max) {

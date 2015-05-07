@@ -27,38 +27,38 @@
 <!-- form start -->  
 {!! Form::model($keyword, ['route' => ['keyword.update', $id], 'enctype' => 'multipart/form-data', 'id' => 'form-manuscript'] ) !!}
 
-<!-- <div class="box box-primary"> -->
-{!! Form::div_open('box box-primary padding-box') !!}
+<div class="box box-primary padding-box">
 	
 	<!-- box-header -->
-	{!! Form::div_open('box-header') !!}
+	<div class="box-header">
+
 		{!! Form::h_custom(3, Lang::get('admin.detail'), 'box-title') !!}
-	{!! Form::div_close() !!}<!-- /.box-header -->
+	</div><!-- /.box-header -->
 	
-	
-	{!! Form::div_open('box-body') !!}
+	<div class="box-body">
 	
 		{!! ErrorDisplay::getInstance()->DisplayAll($errors) !!}
 
-		{!! Form::div_open('form-group') !!}
+		<div class="form-group">
 
 			{!! Form::label_custom(Lang::get('admin.keyword.create.type'), 'text-form-large', true) !!}
 
 			{!! Form::select('lang_code', Constant::$keyword_type, null, ['class'=>'form-control']) !!}
 			
-		{!! Form::div_close() !!}
+		</div>
 
-		{!! Form::div_open('form-group') !!}
+		<div class="form-group">
+		
 			{!! Form::label_custom(Lang::get('admin.keyword.create.name'), 'text-form-large', true)!!}
 
 			{!! Form::textarea_custom('text', null, 5, Lang::get('admin.keyword.create.placeholder.name'), 'form-control') !!}
 			
-		{!! Form::div_close() !!}
+		</div>
 		
 
-	{!! Form::div_close() !!}<!-- end .box-body -->
+	</div><!-- end .box-body -->
 	
-{!! Form::div_close() !!}<!-- /.box box-primary -->
+</div><!-- /.box box-primary -->
 	
 <!-- Submit	 -->
 

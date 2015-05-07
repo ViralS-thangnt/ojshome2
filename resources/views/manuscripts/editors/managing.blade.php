@@ -1,25 +1,18 @@
 @extends('layout.manuscript')
 
+@section('title')
+
+
+@stop
+
 @section('editor')
 
 @section('manuscript-detail')
 @parent
 @stop
 
-<script>
-    $(document).ready(function(){
-        $("form").submit(function(event){
-            // alert(document.getElementById("file").value);
-            if(!confirm('Bạn có chắc chắn muốn gửi bài ? '))
-            {
-                
-                event.preventDefault();
-            }
-        });
-    });
-</script>
 
-{!! Form::model($manuscript->editorManuscript, ['route' => ['editor.manuscript.update', $manuscript->id, $editorManuscript_id], 'id' => 'form-editor-manuscript', 'enctype' => 'multipart/form-data']) !!}
+{!! Form::model($manuscript->editorManuscript, ['route' => ['editor.manuscript.update', $manuscript->id, $editorManuscript_id], 'id' => 'form-editor-manuscript', 'files' => true]) !!}
 
 
 <div class="box box-primary padding-box">
@@ -96,6 +89,7 @@
 
     
 @endif
+
 @if (isset($reviewers))
 <div class="box box-primary padding-box">
     <div class="box-header padding-box">
@@ -131,6 +125,7 @@
                     break;
                 case 'assign-reviewers':
                     condition = ($('#invite_reviewer_ids').val() == null || $('#deadline').val() == '');
+                    alert('condition ' + condition);
                     message = '{{trans('admin.manuscript.alertSelectReviewers')}}';
                     sent_data += 'reviewer_ids=' + $('#invite_reviewer_ids').val() + '&reviewer_names=' + $('#invite_reviewer_ids option:selected').text() + '&deadline=' + $('#deadline').val();
                     break;
@@ -154,9 +149,11 @@
                 }
             });
         });
-
         $('.chosen-select').chosen();
-    })
+        $('.chosen-container').width('100%');
+    });
+    
+    
 </script>
 
 {!! Form::close() !!}

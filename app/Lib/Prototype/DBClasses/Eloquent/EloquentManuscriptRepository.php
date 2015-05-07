@@ -3,11 +3,13 @@
 use Illuminate\Contracts\Auth\Guard;
 use App\Lib\Prototype\BaseClasses\AbstractEloquentRepository;
 use App\Lib\Prototype\Interfaces\ManuscriptInterface;
-use App\Lib\Prototype\Interfaces\UserInterface as UserReopsitory;
+use App\Lib\Prototype\Interfaces\UserInterface;
+use App\Lib\Prototype\Interfaces\EditorManuscriptInterface;
 use App\Manuscript;
 use App\Journal;
 use App\ManuscriptFile;
 use App\EditorManuscript;
+use App\Keyword;
 use App\KeywordManuscript;
 use App\User;
 use URL;
@@ -17,20 +19,24 @@ use Constant;
 use Redirect;
 use DateTime;
 use DB;
+use App\Lib\Prototype\Common\traitJournal;
 
 // use ConstantArray;
 
 
 class EloquentManuscriptRepository extends AbstractEloquentRepository implements ManuscriptInterface
 {
+    use traitJournal;
 
     protected $editor_model;
     protected $user_repo;
+    protected $journal_model;
 
-    public function __construct(Manuscript $model, EditorManuscript $editor_model, UserReopsitory $user_repo)
+    public function __construct(Manuscript $model, EditorManuscriptInterface $editor_model, UserInterface $user_repo, Journal $journal_model)
     {
         $this->model = $model;
         $this->editor_model = $editor_model;
+        $this->journal_model = $journal_model;
         $this->user_repo = $user_repo;
         $this->user = \Auth::user();
     }
@@ -49,13 +55,13 @@ class EloquentManuscriptRepository extends AbstractEloquentRepository implements
         $manuscript->save();
 
         // manuscript id just insert to database
-        $key_manu = DB::getPdo()->lastInsertId();
+        $key_manu = $manuscript->id;	//DB::getPdo()->lastInsertId();
 
         //Constant::$keyword_type[VI]
         $this->saveKeywords(Input::get('keyword_vi'), Input::get('keyword_en'), $key_manu, $id);
 
         // save files information
-        $this->saveManuscriptFiles($id, $this->user->id, $key_manu);
+        $this->saveManuscriptFiles($key_manu, $this->user->id, AUTHOR_FILE);
 
         return $manuscript;
     }
@@ -97,61 +103,36 @@ class EloquentManuscriptRepository extends AbstractEloquentRepository implements
         }
     }
 
-    public function saveManuscriptFiles($manu_id, $user_id, $new_key_manu_id = null, $type = null, $new_key_manu_file_id = null)
+    // public function saveManuscriptFiles($manu_id, $user_id, $new_key_manu_id = null, $type = null, $new_key_manu_file_id = null)
+    public function saveManuscriptFiles($manu_id, $user_id, $type = null)
     {
-        
-        if(Session::has(FILE_UPLOAD_SESSION))
-        {
-            if($manu_id)
-            {   
-                
-                if($new_key_manu_file_id)
-                {
-                    $manu = ManuscriptFile::find($new_key_manu_file_id);
-                }
-                else
-                {
-                    //edit manu
-                    $manu = ManuscriptFile::where('user_id', $user_id)
-                                    ->where('manuscript_id', $manu_id)
-                                    ->first();
-                }
-                                    
-            }
-            else
-            {
-                // new manu
-                $manu = new ManuscriptFile;
-                $manu->manuscript_id = $new_key_manu_id;
-                // dump('saveManuscriptFiles');
-            }
+        if(!Session::has(FILE_UPLOAD_SESSION))
+            
+            return null;
 
-            // TODO: need delete old file (soft delete or hard delete ?)
-
-            //
-
-            if(!$manu)
-            {
-                Session::flash(SUCCESS_MESSAGE, 'Lỗi upload file: Không có File tương ứng với bản thảo được up lên trước đây ');
-                $manu = new ManuscriptFile;
-                $manu->manuscript_id = $manu_id;
-            }
-
-            $manu->user_id = $user_id;
-            $manu->name = Session::get(FILE_UPLOAD_SESSION);
-            if ($type) {
-                $manu->type = $type;
-            }
-            // $manu->type = Session::has('FILE_UPLOAD_TYPE') ? Session::get('FILE_UPLOAD_TYPE') : '';
-            $manu->total_page = Session::has(FILE_UPLOAD_TOTAL_PAGE) ? Session::get(FILE_UPLOAD_TOTAL_PAGE) : 0;
-            $manu->extension = Session::has(FILE_UPLOAD_EXTENSION) ? Session::get(FILE_UPLOAD_EXTENSION) : '';
-
-            $manu->save();
-
-            return $manu;
+        $manu_file = null;
+        if($manu_id)
+        {   
+            // Get data từ db
+            $manu_file = ManuscriptFile::where('user_id', $user_id)->where('manuscript_id', $manu_id)
+                                        ->orderBy('updated_at', 'desc')->first(); 
         }
 
-        return null;
+        // check exist
+        if(!$manu_file)
+        {
+            $manu_file = $this->createNewManuscriptFile($manu_id, $user_id, $type, 0);
+        }
+        
+        // TODO: need delete old file (soft delete or hard delete ?)
+        //
+
+        $manu_file->name = Session::get(FILE_UPLOAD_SESSION);
+        $manu_file->total_page = Session::has(FILE_UPLOAD_TOTAL_PAGE) ? Session::get(FILE_UPLOAD_TOTAL_PAGE) : 0;
+        $manu_file->extension = Session::has(FILE_UPLOAD_EXTENSION) ? Session::get(FILE_UPLOAD_EXTENSION) : '';
+        $manu_file->save();
+
+        return $manu_file;
     }
 
     public function checkSaveAjax($manu_id, $editor_id, $stage = SCREENING)
@@ -210,9 +191,154 @@ class EloquentManuscriptRepository extends AbstractEloquentRepository implements
         return Constant::$view_manuscript_editor[$permission];
     }
 
+    public function getManagingEditorViewData($manuscript_id)
+    {
+        $data = $this->getViewDataById($manuscript_id);
+
+        //get list invite reviewers
+        $data['reviewed_list'] = $this->user_repo->getByIds($data['manuscript']->reviewer_ids);
+        //get list rejected reviewers
+        $data['reject_list'] = $this->user_repo->getByIds($data['manuscript']->reject_reviewer_ids);
+        //get list invite reviewer
+        $data['invite_list'] = $this->user_repo->getByIds($data['manuscript']->invite_reviewer_ids);
+
+        $data['reviewers'] = $this->user_repo->getListIds(REVIEWER);
+// dd($data, 'MANAGING_EDITOR');
+        return $data;
+    }
+
+    public function getChiefViewData($manuscript_id)
+    {
+        $data = $this->getViewDataById($manuscript_id);
+        $data['journals'] = $this->getUnpublishJournal();
+
+        return $data;
+    }
+
+    public function getSectionEditorViewData($manuscript_id)
+    {
+        $data = $this->getViewDataById($manuscript_id);
+        $data['view'] = 'manuscripts.editors.includes.inreview.section';
+
+        if ($data['manuscript']->status == IN_EDITING) {
+            $data['copy_editors'] = $this->user_repo->getListIds(COPY_EDITOR);
+            $data['view'] = 'manuscripts.editors.includes.inediting.section';
+        }
+
+        return $data;
+    }
+
+    public function getCopyEditorViewData($manuscript_id)
+    {
+        $data = $this->getViewDataById($manuscript_id);
+
+        if ($data['manuscript']->is_print_out) {
+            $file_type = LAYOUT_PRINT_FILE;
+            $data['label'] = 'Tải xuống bản thảo chế bản';
+            $data['view'] = 'manuscripts.editors.includes.inediting.printout.copy';
+        } elseif ($data['manuscript']->is_revise) {
+            $file_type = REVISE_FILE;
+            $data['label'] = 'Tải xuống bản thảo hiệu đính';
+            $data['view'] = 'manuscripts.editors.includes.inediting.copy';
+        } else {
+            $file_type = $data['manuscript']->file_version;
+            $data['layout_editors'] = $this->user_repo->getListIds(LAYOUT_EDITOR);
+            $data['label'] = 'Tải xuống bản thảo';
+            $data['view'] = 'manuscripts.editors.includes.inediting.copy';
+        }
+
+        $data['file_download'] = getFileByType($data['manuscript']->manuscriptFiles, $file_type);
+        
+        return $data;
+    }
+
+    public function getLayoutEditorViewData($manuscript_id)
+    {
+        $data = $this->getViewDataById($manuscript_id);
+
+        if ($data['manuscript']->is_print_out) {
+            $file_type = LAYOUT_PRINT_FILE;
+            //Khi bản thảo đã chế bản, btv chế bản có thể xem các nhận xét bản bông
+            $data['copyeditor_comment'] = $this->editor_model->getCommentsByEditorIds($data['manuscript']->current_editor_manuscript_id, 
+                                                                                      $data['manuscript']->editor_id);
+            $data['author_comment'] = $this->editor_model->getCommentsByEditorIds($data['manuscript']->current_editor_manuscript_id, 
+                                                                                 $data['manuscript']->author_id);
+        } else {
+            $file_type = REVISE_FILE;
+        }
+
+        $data['file_download'] = getFileByType($data['manuscript']->manuscriptFiles, $file_type);
+
+        return $data;
+    }
+
+    public function getAuthorViewData($manuscript_id)
+    {
+        $data = $this->getViewDataById($manuscript_id);
+
+        // Get data for keyword combobox 
+        $data['keyword_en'] = $this->getListKeywords('lang_code', EN , 'id', 'text');
+        $data['keyword_vi'] = $this->getListKeywords('lang_code', VI, 'id', 'text');
+        
+        $data['keyword_en_selected'] = $this->getDataComboboxSelected($manuscript_id, EN);
+        $data['keyword_vi_selected'] = $this->getDataComboboxSelected($manuscript_id, VI);
+
+        //Chi cho phep tac gia chinh sua khi ban thao bi yeu cau chinh sua hoac khi UNSUBMIT
+        $data['disabled'] = in_array($data['manuscript']->status, array(IN_SCREENING_EDIT, IN_REVIEW_EDIT, UNSUBMIT)) ? false : true;
+        $data['disable_edit'] = (is_null($data['manuscript']->is_pre_public) && !is_null($data['manuscript']->is_print_out)) ? false : true;
+
+        return $data;
+    }
+
+    //save comment for section editor
+    public function saveSectionEditor($data, $id, $editor_manuscript_id = null)
+    {
+        // Upload file with file type = SE_FILE
+        if (isset($data['file'])) {
+            $this->uploadFileEditor($id, $this->user->id, SE_FILE);
+        }
+
+        $manuscript = $this->model->find($id);
+
+        //section editor assign manuscript for copy editor in editing stage
+        if (isset($data['editor_id'])) {
+            $manuscript->fill($data);
+            $manuscript->save();
+
+            return null;
+        }
+
+        $manuscript->is_review = $data['is_review'];
+        $data['stage'] = getStageByStatus($manuscript->status);
+        $data['current_id'] = $manuscript->current_editor_manuscript_id;
+        $manuscript->current_editor_manuscript_id = $data['current_id'];
+        $manuscript->save();
+
+        return $this->saveEditorManuscript($data, $id, $editor_manuscript_id);
+    }
+
+    public function saveEditorManuscript($data, $id, $editor_manuscript_id)
+    {
+        if ($editor_manuscript_id) {
+            $editor_manuscript = EditorManuscript::find($editor_manuscript_id);
+        } else {
+            $editor_manuscript = new EditorManuscript();
+        }
+        isset($data['decide']) ? $data['decide'] = $data['decide'] : '';
+        if(!isset($data['decide']))
+            $data['decide'] = '';
+        $data['manuscript_id'] = $id;
+        $data['user_id'] = $this->user->id;
+        $editor_manuscript->fill($data);
+        $editor_manuscript->save();
+
+        return $editor_manuscript;
+    }
+
     public function getViewDataById($manuscript_id)
     {
         $data = ['manuscript' => $this->getByIdWith($manuscript_id)];
+
         if ($data['manuscript']->editorManuscript) {
             $data['editorManuscript_id'] =  $data['manuscript']->editorManuscript->id;
             $data['loop'] = $data['manuscript']->editorManuscript->loop; 
@@ -222,32 +348,6 @@ class EloquentManuscriptRepository extends AbstractEloquentRepository implements
             $data['loop'] = 1;
             $data['disable_edit'] = false;
         }
-        
-        if ($this->hasPermission(AUTHOR)) 
-        {
-            // Get manuscript file id of layout editor (LAYOUT_PRINT_FILE)
-            $data['layout_print_file_id'] = $this->getFileManuscriptLayoutEditor($data['manuscript']->id, 
-                                                                            $data['manuscript']->layout_editor_id, 
-                                                                            LAYOUT_PRINT_FILE);
-            $data['section_editor'] = User::find($data['manuscript']->editor_id);
-
-            return $data;
-        }
-
-        if ($this->hasPermission(MANAGING_EDITOR)) 
-        {
-            //get list invite reviewers
-            $data['reviewed_list'] = $this->user_repo->getByIds($data['manuscript']->reviewer_ids);
-            //get list rejected reviewers
-            $data['reject_list'] = $this->user_repo->getByIds($data['manuscript']->reject_reviewer_ids);
-            //get list invite reviewer
-            $data['invite_list'] = $this->user_repo->getByIds($data['manuscript']->invite_reviewer_ids);
-        }
-
-        // if ($this->hasPermission(COPY_EDITOR)) 
-        // {
-        //     $data = $this->getDataForCopyEditor($data);
-        // }
 
         //check if current user is in rejected reviewer list
         if (findInSet($this->user->id, $data['manuscript']->reject_reviewer_ids)) 
@@ -260,243 +360,50 @@ class EloquentManuscriptRepository extends AbstractEloquentRepository implements
         $data['stage'] = getStageByStatus($data['manuscript']->status);
         $data['current_id'] = makeCurrentId($manuscript_id, $data['stage'], $data['loop']);  
 
-        switch ($data['manuscript']->status) {
-            case IN_SCREENING:
-                $data = $this->getDataForInScreening($data);
-                break;
-
-            case IN_REVIEW:
-                $data = $this->getDataForInReview($data, $manuscript_id);
-                break;
-
-            case IN_EDITING:
-                $data = $this->getDataForInEditing($data);
-                break;
-            default:
-                
-                break;
-        }
-// dd($data);
         return $data;
     }
 
-    public function getDataForInScreening($data)
+    //save comment for chief editor
+    public function saveChiefEditor($data, $id, $editor_manuscript_id = null)
     {
-        if ($this->hasPermission(MANAGING_EDITOR)) 
-        {
-            $data['screening_editors'] = $this->user_repo->getListIds(SCREENING_EDITOR);
-            // Get info screening editors by manuscript id and stage = SCREENING
-            $data['screening_editors_info'] = $this->getScreeningEditorByManuscriptAndStage($data['manuscript']->id, SCREENING);
-        }
-        else if($this->hasPermission(SCREENING_EDITOR))
-        {
-            //screening editor
-            $data['reviewers'] = $this->user_repo->getListIds(REVIEWER);
-            // dd($data['manuscript']->id);
-            $editor_manu = EditorManuscript::where('manuscript_id', $data['manuscript']->id)
-                                                ->where('user_id', \Auth::user()->id)->get();
-                                                // dd(count($editor_manu));
-            count($editor_manu) != 0 ? $data['editorManuscript_id'] = \Auth::user()->id : '';
-            // $data['editorManuscript_id'] = \Auth::user()->id;
-            // dd($data, $this->user_repo, \Auth::user()->id);
+        $manuscript = $this->model->find($id);
+        $manuscript->status = $this->nextStatus($manuscript->status, $data['decide'], $id);
+        if (isset($data['pre_journal_id'])) {
+            $manuscript->pre_journal_id = $data['pre_journal_id'];
+            $manuscript->order = $this->countManuscripts($data['pre_journal_id']) + 1;
         }
 
-        return $data;
+        $data['stage'] = getStageByStatus($manuscript->status);
+        if (!in_array($manuscript->status, [IN_SCREENING_REFUSE, IN_REVIEW_REFUSE, IN_SCREENING_EDIT, IN_REVIEW_EDIT])) {
+            $data['current_id'] = makeCurrentId($id, $data['stage'], 1);
+        } else {
+            $data['current_id'] = $manuscript->current_editor_manuscript_id;
+        }
+
+        $manuscript->current_editor_manuscript_id = $data['current_id'];
+
+        $manuscript->save();
+
+        return $this->saveEditorManuscript($data, $id, $editor_manuscript_id);
     }
 
-    public function getDataForInReview($data, $manuscript_id)
+    public function saveCopyEditor($data, $id, $editor_manuscript_id)
     {
-        if ($this->hasPermission(MANAGING_EDITOR)) 
-        {
-            // dd($data);
-            $data['section_editors'] = $this->user_repo->getListIds(SECTION_EDITOR);
-            $data['reviewers'] = $this->user_repo->getListIds(REVIEWER);
-
-            // Get info screening editors by manuscript id and stage = SCREENING
-            $data['screening_editors_info'] = $this->getScreeningEditorByManuscriptAndStage($data['manuscript']->id, SCREENING);
-            
-        } 
-        else if($this->hasPermission(SECTION_EDITOR))
-        {
-
-            // section editor
-            $temp = $this->getReviewerEditorAndCommentsById($manuscript_id, \Auth::user());
-            $data['reviewers_comments'] = $temp['reviewer'];
-            $data['section_editor_comments'] = $temp['section_editor'];
-
+        $manuscript = $this->model->find($id);
+        //Giai đoạn hiệu đính: btv bản thảo upload file hiệu đính
+        if (isset($data['file'])) {
+            $this->uploadFileEditor($id, $this->user->id, REVISE_FILE);
         }
+        //Giai đoạn hiệu đính: data gồm id btv chế bản,
+        //update trạng thái bản thảo sang đã hiệu đính
+        $manuscript->fill($data);
+        $manuscript->save();
 
-        return $data;
-    }
-
-    public function getDataForInEditing($data)
-    {
-        // Get data for IN_EDITING status
-        if ($this->hasPermission(COPY_EDITOR)) 
-        {
-            // dd('saj');
-            $data = $this->getDataForCopyEditorInEditing($data);
-        }
-        else if ($this->hasPermission(SECTION_EDITOR)) 
-        {
-
-        } 
-        else if ($this->hasPermission(MANAGING_EDITOR)) 
-        {
-
-        } 
-        else if ($this->hasPermission(AUTHOR)) 
-        {
-
-        }
-        else if ($this->hasPermission(LAYOUT_EDITOR)) 
-        {
-            $data = $this->getDataForLayoutEditorInEditing($data);
-        }
-
-        return $data;
-    }
-
-    public function getDataForLayoutEditorInEditing($data)
-    {
-
-        if($data['manuscript']->is_pre_public == NOT_PRE_PUBLIC)
-        {
-            // layout_print (Chế bản)
-            // Get info manuscript file of copy_editor
-            $data['layout_editor_file_id'] = $this->getFileManuscriptLayoutEditor($data['manuscript']->id, $data['manuscript']->editor_id, REVISE_FILE);
-        }
-        else
-        {
-            // pre public (Kiểm bông)
-            // LAYOUT_PRINT_FILE
-            $data['layout_editor_file_id'] = $this->getFileManuscriptLayoutEditor($data['manuscript']->id, \Auth::user()->id, LAYOUT_PRINT_FILE);
-        }
-
-        $data['copy_editor_comments'] = EditorManuscript::with('user')->where('manuscript_id', $data['manuscript']->id)
-                                                        ->where('user_id', $data['manuscript']->editor_id)
-                                                        ->where('current_id', $data['manuscript']->current_editor_manuscript_id)
-                                                        ->first();
-        $data['copy_editor'] = $data['copy_editor_comments']->user;
-        // dd($data);
-
-        return $data;
-    }
-
-    public function getDataForCopyEditorInEditing($data)
-    {
-        if($data['manuscript']->is_pre_public == PRINT_OUT)
-        {
-            // copy editor 
-            // Get information of manuscript file of layout editor
-            $data['layout_print_file_id'] = $this->getFileManuscriptLayoutEditor($data['manuscript']->id, 
-                                                                            $data['manuscript']->layout_editor_id, 
-                                                                            LAYOUT_PRINT_FILE);
-            // Get information of layout editor
-            $data['layout_editor'] = User::find($data['manuscript']->layout_editor_id);
-
-            $data['comments'] = $data['manuscript']->editorManuscript['comments'];
-        }
-        else
-        {
-            //get list Layout Editor
-            $data['layout_editors'] = $this->user_repo->getListIds(LAYOUT_EDITOR);
-        }
-
-        return $data;
-    }
-
-    public function getFileManuscriptLayoutEditor($manu_id, $editor_id, $type = REVISE_FILE)
-    {
-        $manu_file = ManuscriptFile::where('manuscript_id', $manu_id)
-                                    ->where('user_id', $editor_id)
-                                    ->where('type', $type)
-                                    ->first();
-                                    // dd($manu_file);
-
-        if($manu_file)
-        {
-            return ;
-        }
-
-        return null;
-    }
-
-    // Get screening editors of manuscript
-    public function getScreeningEditorByManuscriptAndStage($manuscript_id, $stage)
-    {
-        // dump($manuscript_id, $stage);
-        $editor_manu = EditorManuscript::with('user')
-                                ->where('manuscript_id', $manuscript_id)
-                                ->where('stage', $stage)
-                                // ->with('manuscript')
-                                ->get()
-                                ;
-                                // dump($editor_manu);
-                                // dd($editor_manu);
-        $data = array();
-        if($editor_manu)
-        {
-            foreach ($editor_manu as $value) {
-                // dump($value->user);
-                $data['id'] = $value->id;
-                $data['name'] = $value->user['last_name'] . '  ' . $value->user['middle_name'] . '  ' . $value->user['first_name'] ;
-                $data['loop'] = $value->loop;
-                $data['stage'] = $value->stage;
-                $data['comments'] = $value->comments;
-            }
-        }
-        // dd($data);
-
-        return $data;
-    }
-
-
-    // Get list reviewer and reviewer's comments
-    public function getReviewerEditorAndCommentsById($manuscript_id, $section_editor)
-    {
-        $reviewer = EditorManuscript::with('user')
-                                    ->where('manuscript_id', $manuscript_id)
-                                    ;
-        $data = array();
-        foreach ($reviewer->get() as $value) {
-            // dump($value);
-            if($value->user->id == $section_editor->id)
-            {
-                $data['section_editor'] = array(
-                    'name'      =>  $section_editor->last_name . ' ' . $section_editor->middle_name . ' ' . $section_editor->first_name,
-                    'comments'  =>  $value->comments,
-                    'loop'      =>  $value->loop,
-                    'decide'    =>  ($value->decide) ? $value->decide : 0);
-            }
-            else
-            {
-                $data['reviewer'][$value->user->id] = array(
-                    'name'      =>  $value->user->last_name . ' ' . $value->user->middle_name . ' ' . $value->user->first_name,
-                    'comments'  =>  $value->comments,
-                    'loop'      =>  $value->loop,
-                    'decide'    =>  ($value->decide) ? $value->decide : 0);
-            }
-        }
-
-        // if section editor not exist in Editor manuscript table
-        if(!isset($data['section_editor']))   
-        {
-            $data['section_editor'] = array(
-                    'name'      =>  '',
-                    'comments'  =>  '',
-                    'loop'      =>  0,
-                    'decide'    =>  0);
-        }
-        // dd($data);
-        return $data;
+        return $this->saveEditorManuscript($data, $id, $editor_manuscript_id);
     }
 
     public function formModifyEditor($data, $id, $editor_manuscript_id = null)
     {
-        // dump(Input::all());
-        //         dd($data);
-        // dump($editor_manuscript_id);
         //reviewer reject review
         if (isset($data['rejected']) && $data['rejected']) {
             $this->updateReviewerList($id);
@@ -508,6 +415,7 @@ class EloquentManuscriptRepository extends AbstractEloquentRepository implements
 
         //check if current user still have assign permission
         if (!$this->checkAssignPermission($manuscript)) {
+
             return null;
         }
 
@@ -530,19 +438,12 @@ class EloquentManuscriptRepository extends AbstractEloquentRepository implements
 
         //save comment and decide
         if ($editor_manuscript_id) {
-            // $editor_manuscript = $this->editor_model->find($editor_manuscript_id);
-            
             $editor_manu_id = EditorManuscript::where('manuscript_id', $id)
                                                     ->where('user_id', $editor_manuscript_id)
                                                     ->first()->id;
-                                                    
             $editor_manuscript = $this->editor_model->find($editor_manu_id);
-
-            // dump('old');
-            // dd($editor_manuscript);
         } else {
             $editor_manuscript = $this->editor_model;
-            // dump('new');
         }
 
         if($data['decide']) 
@@ -557,14 +458,11 @@ class EloquentManuscriptRepository extends AbstractEloquentRepository implements
         // $data = $this->saveEditorManuscript($data, $id, $editor_manuscript_id);
 
         if ($this->hasPermission(SCREENING_EDITOR) and isset($data['is_sent']) and $data['is_sent'] != 1 ) {
-
             $this->saveDraftScreeningEditor($id, $editor_manuscript, $manuscript);
             
             return null;
-
         } 
-        
-        // dd($data, $editor_manuscript);
+
         $editor_manuscript->save();
 
         if ($this->hasPermission(SECTION_EDITOR)) {
@@ -578,7 +476,6 @@ class EloquentManuscriptRepository extends AbstractEloquentRepository implements
             
             // Upload file with file type = REVIEWER_FILE
             if (isset($data['file']) and !empty($data['file'])) {
-                
                 $this->uploadFileEditor($id, $this->user->id, REVIEWER_FILE);
             } 
 
@@ -613,10 +510,10 @@ class EloquentManuscriptRepository extends AbstractEloquentRepository implements
         }
 
         $manuscript->status = $this->nextStatus($manuscript->status, $data['decide'], $id);
-        // dump($manuscript);
-        // dd($data);
+
         $stage = getStageByStatus($manuscript->status);
-        if (!in_array($manuscript->status, [IN_SCREENING_REFUSE, IN_REVIEW_REFUSE, IN_SCREENING_EDIT, IN_REVIEW_EDIT])) {
+        if (!in_array($manuscript->status, [IN_SCREENING_REFUSE, IN_REVIEW_REFUSE, IN_SCREENING_EDIT, IN_REVIEW_EDIT])) 
+        {
             $manuscript->current_editor_manuscript_id = makeCurrentId($id, $stage, 1);
         }
 
@@ -630,7 +527,6 @@ class EloquentManuscriptRepository extends AbstractEloquentRepository implements
 
             // Setup EditorManuscript
             $editor_manuscript->stage = $stage++;
-dd($stage);
             $current_id = makeCurrentId($id, $editor_manuscript->stage, 1);
 
             $editor_manu->current_id = $current_id;
@@ -668,22 +564,6 @@ dd($stage);
         $manuscript->save();
     }
 
-    public function saveEditorManuscript($data, $id, $editor_manuscript_id)
-    {
-        if ($editor_manuscript_id) {
-            $editor_manuscript = $this->editor_model->find($editor_manuscript_id);
-        } else {
-            $editor_manuscript = $this->editor_model;
-        }
-        isset($data['decide']) ? $data['decide'] = current($data['decide']) : ''; 
-        $data['manuscript_id'] = $id;
-        $data['user_id'] = $this->user->id;
-        $editor_manuscript->fill($data);  
-        $editor_manuscript->save();
-
-        return $data;
-    }
-
     public function sectionEditorUploadFile($id, $manuscript, $data, $user_id)
     {
         // Upload file with file type = SE_FILE
@@ -715,8 +595,6 @@ dd($stage);
 
     public function copyEditorUploadFileRevise($manuscript, $data, $user_id)
     {
-        // dd($data, $manuscript->editor_id);
-
         // hiệu đính, kết thúc công việc của copy editor trong phần hiệu đính
         // cho theo dõi đến khi xuất bản
         $manuscript->is_revise = $data['is_revise'];
@@ -725,18 +603,18 @@ dd($stage);
         $manuscript->layout_editor_id = $data['layout_editor_id'];
 
         $manuscript->save();
-        // dd($data);
+
         // Upload file with file type = REVISE_FILE
         if (isset($data['file']) and !empty($data['file'])) {
             // lựa chọn file do copy editor upload lên
-            $this->uploadFileEditor($id, $user_id, REVISE_FILE, null, NEW_MANUSCRIPT_FILE);
+            $this->uploadFileEditor($manuscript->id, $user_id, REVISE_FILE);
         } 
-        else
-        {
-            // nếu ko có file do copy editor upload lên, lựa chọn phiên bản của tác giả
-            // $this->createNewManuscriptFile($id, $this->user->id, REVISE_FILE, NEW_MANUSCRIPT_FILE);
-            $this->uploadFileEditor($id, $user_id, REVISE_FILE, null, COPY_MANUSCRIPT_FILE);
-        }
+        // else
+        // {
+        //     // nếu ko có file do copy editor upload lên, lựa chọn phiên bản của tác giả
+        //     // $this->createNewManuscriptFile($id, $this->user->id, REVISE_FILE, NEW_MANUSCRIPT_FILE);
+        //     $this->uploadFileEditor($id, $user_id, REVISE_FILE);
+        // }
 
         return $manuscript;
 
@@ -755,21 +633,18 @@ dd($stage);
 
         if($_FILES['file']['type'] == FILE_TYPE_PRINT_OUT)
         {
-            $this->uploadFileEditor($id, $user_id, LAYOUT_PRINT_FILE, null, NEW_MANUSCRIPT_FILE);
+            $this->uploadFileEditor($id, $user_id, LAYOUT_PRINT_FILE);
         }
-
     }
 
     public function layoutEditorStartPublish($manuscript, $id)
     {
-        // dd($this->user->id);
         // layout editor kích hoạt giai đoạn xuất bản
         // Tranfer to PUBLISH
         $manuscript->status = PUBLISHED;
 
         // Create new current_id
         $manuscript->current_editor_manuscript_id = makeCurrentId($id, getStageByStatus($manuscript->status), 1);
-        
         $manuscript->save();
 
         // Create new Editor Manuscript
@@ -784,6 +659,30 @@ dd($stage);
         return $manuscript;
     }
 
+
+    public function saveLayoutEditor($data, $id, $editor_manuscript_id)
+    {
+        $manuscript = $this->model->find($id);
+        //Giai đoạn chế bản: btv chế bản upload file chế bản
+        $file_type = LAYOUT_PRINT_FILE;
+
+        //Giai đoạn kiểm bông: btv chế bản upload file sơ bản,
+        //kết thúc quá trình biên tập, update status bản thảo sang xuất bản
+        if (isset($data['is_pre_public'])) {
+            $file_type = PRE_PRINT_FILE;
+            $data['status'] = PUBLISHED;
+            $data['current_editor_manuscript_id'] = makeCurrentId($id, PUBLISHING, 1);
+        }
+
+        if (isset($data['file'])) {
+            $this->uploadFileEditor($id, $this->user->id, $file_type);
+        }
+
+        $manuscript->fill($data);
+        $manuscript->save();
+
+        return $manuscript;
+    }
 
     public function checkAssignPermission($manuscript)
     {
@@ -835,6 +734,17 @@ dd($stage);
                     return IN_EDITING;
                 case REQUIRE_EDIT:
                     return IN_REVIEW_EDIT;
+                case RE_REVIEW:
+                    return IN_REVIEW_EDIT;
+            }
+        }
+
+        if ($current_status == IN_EDITING) {
+            switch ($decide) {
+                case ACCEPT:
+                    
+                    return PUBLISHED;
+                
                 default:
                     # code...
                     break;
@@ -842,11 +752,12 @@ dd($stage);
         }
     }
 
-
-
     public function getByIdWith($id)
     {
-        $relations = ['manuscriptFiles'];
+        $relations ['manuscriptFiles'] = function($query) {
+            $query->orderBy('updated_at', 'asc');
+        };
+
         if ($this->hasPermission(MANAGING_EDITOR)) {
             $relations[] = 'editorManuscript';
         } else {
@@ -870,16 +781,81 @@ dd($stage);
         return $query->findOrFail($id);
     }
 
+    //Get list manuscript data for each user type
+
+    public function getColumnTable($process, $actor, $reviewer_list = false)
+    {
+        return [
+            'data'             =>  $this->getDataTable($process, $actor, $reviewer_list),
+            'col_header'       =>  Constant::$tableColumns[$process][$actor]['col_header'],
+            'col_db'           =>  Constant::$tableColumns[$process][$actor]['col_result'],
+        ];
+    }
+
+    public function getDataTable($process, $actor, $reviewer_list = false)
+    {
+        $col = Constant::$tableColumns[$process][$actor]['col_select'];
+        $relate_cols = Constant::$tableColumns[$process][$actor]['col_relate'];
+        $relates = $this->getRelate($process, $actor);
+
+        $status = in_array($process, [WAIT_REVIEW, REVIEWED, REJECTED_REVIEW]) ? IN_REVIEW : $process;
+
+        $data = $this->model->status($status)
+                            ->actor($actor, $this->user->id, $reviewer_list)
+                            ->select($col)
+                            ->with($relates)->get();
+
+        $data = $this->mergeRelateCol($relate_cols, $data);
+
+        return $data;
+    }
+
+    public function mergeRelateCol($relate_cols, $data)
+    {
+        foreach ($data as $value) {
+            foreach ($relate_cols as $relate => $col) {
+                $property = $relate.'_'.$col;
+                $value->$property = is_object($value->$relate) ? $value->$relate->$col : '';
+            }
+        }
+
+        return $data;
+    }
+
+    public function getRelate($process, $actor)
+    {
+        $relates = Constant::$relateColSelect[$process][$actor];
+
+        $result = array();
+        foreach ($relates as $key => $value) {
+            if ($key == 'editorManuscript' && $this->hasPermission(REVIEWER)) {
+                $result[$key] = function($query) use ($value) {
+                    $query->select($value)->where('user_id', $this->user->id);
+                };
+            } else {
+                $result[$key] = function($query) use ($value) {
+                    $query->select($value);
+                };
+            }
+        }
+
+        return $result;
+    }
+
 	public function getByStatus($status = null){
+
 		switch ($status) {
 			case IN_REVIEW:				
 				$data = $this->getDataInReview($this->user, $status);
 				break;
 			case UNSUBMIT:
+
 				$data = $this->getUnsubmit();
                 break;
-            case REJECTED:
-                return $this->getDataRejected($this->user, $status);
+            // case REJECTED:
+            case IN_SCREENING_REFUSE:
+            case IN_REVIEW_REFUSE:
+                $data = $this->getDataRejected($this->user, $status);
                 break;
             case IN_SCREENING:
                 $data = $this->getDataInScreening($this->user, $status);
@@ -888,21 +864,18 @@ dd($stage);
                 $data = $this->getDataRejectedReview($this->user, $status);
                 break;
 			case REVIEWED:				
-				//$data = $this->getDataReviewer($this->user, $status);
-                $data = $this->getReviewed();
+				$data = $this->getDataReviewer($this->user, $status);
+                // $data = $this->getReviewed();
 				break;
             case IN_EDITING:
                 $data = $this->getInEditing();
                 break;
 			case PUBLISHED:
 				$data = $this->getDataPublished($this->user, $status);
+                break;
 
             case WITHDRAWN:
                 $data = $this->getDataWithDrawn($this->user, $status);
-                break;
-            case WAIT_REVIEW:
-                //$data = $this->getDataWaitReview($this->user, $status);
-                $data = $this->getWaitReview();
                 break;
             case ALL:
                 $data = $this->getDataAll($this->user);
@@ -932,6 +905,36 @@ dd($stage);
 
     }
 
+//=======================================================================
+// hàm dùng để lấy data cho trang http://..../admin/manuscript/reviewer
+// các biến được sử dụng trong hàm
+// view chỉ dùng cho 'nhà phản biện'
+// $col        : các columns cần lấy ra 
+// $col_header : tiêu đề của bảng hiển thị
+// $key        : tên columns
+// ======================================================================
+    public static function getDataReviewer($user,$status)
+    {
+        $col_header = Constant::$reviewer['col_header'];
+        $col        = Constant::$reviewer['col'];
+        $col_db     = Constant::$reviewer['col_db'];
+
+        $manuscripts = Manuscript::where('status', '=', $status)
+                            ->selectColumns($col)
+                            ->with(['editorManuscript' =>function($q){
+                                $q->select('id','loop','delivery_at','decide','section_editor_decide');
+                            }])
+                            ->get();
+                         
+        $manuscripts->each(function ($manuscript) {
+            $manuscript->delivery_at = date("d/m/Y", strtotime($manuscript->delivery_at));
+            $manuscript->process = $manuscript->status;
+            $manuscript->section_editor_decide = $manuscript->editorManuscript->section_editor_decide;
+            $manuscript->decide = $manuscript->editorManuscript->decide;
+        });
+        return array('data' => $manuscripts, 'col_header' => $col_header, 'col_db' => $col_db);
+
+    }
 
 //=======================================================================
 // hàm dùng để lấy data cho trang http://..../admin/manuscript/all
@@ -949,7 +952,7 @@ dd($stage);
 
         $manuscripts = Manuscript::selectColumns($col)
                             ->get();
- 
+                            
         return array('data' => $manuscripts, 'col_header' => $col_header, 'col_db' => $col_db);
     }
 
@@ -1013,36 +1016,6 @@ dd($stage);
     }
 
 //=======================================================================
-// hàm dùng để lấy data cho trang http://..../admin/manuscript/reviewer
-// các biến được sử dụng trong hàm
-// view chỉ dùng cho 'nhà phản biện'
-// $col        : các columns cần lấy ra 
-// $col_header : tiêu đề của bảng hiển thị
-// $key        : tên columns
-// ======================================================================
-    public static function getDataReviewer($user,$status)
-    {
-        $col_header = Constant::$reviewer['col_header'];
-        $col        = Constant::$reviewer['col'];
-        $col_db     = Constant::$reviewer['col_db'];
-
-        $manuscripts = Manuscript::where('status', '=', $status)
-                            ->selectColumns($col)
-                            ->with(['editorManuscript' =>function($q){
-                                $q->select('id','loop','delivery_at','decide','section_editor_decide');
-                            }])
-                            ->get();
-                         
-        $manuscripts->each(function ($manuscript) {
-            $manuscript->delivery_at = date("d/m/Y", strtotime($manuscript->delivery_at));
-            $manuscript->process = $manuscript->status;
-            $manuscript->section_editor_decide = $manuscript->editorManuscript->section_editor_decide;
-            $manuscript->decide = $manuscript->editorManuscript->decide;
-        });
-        return array('data' => $manuscripts, 'col_header' => $col_header, 'col_db' => $col_db);
-
-    }
-//=======================================================================
 // hàm dùng để lấy data cho trang http://..../admin/manuscript/published
 // các biến được sử dụng trong hàm
 // $col        : các columns cần lấy ra 
@@ -1074,170 +1047,6 @@ dd($stage);
             
             $manuscript->send_at      = date("d/m/Y", strtotime($manuscript->send_at));
         });
-        return array('data' => $manuscripts, 'col_header' => $col_header, 'col_db' => $col_db);
-    }
-
-    public function getDataRejectedReview($user, $status)
-    {
-   
-        $pattern    = ['status'=> $status, 'editor_id' => $user->id];
-        $col_header = Constant::$rejectedReview['col_header'];
-        $col        = Constant::$rejectedReview['col'];
-        $col_db     = Constant::$rejectedReview['col_db'];
-
-        $manuscripts = Manuscript::selectColumns($col)
-                            ->with(['editorManuscript' =>function($q){
-                                $q->select('id','delivery_at','created_at');
-                            }])  
-                            ->CheckWhere($pattern)                       
-                            ->get();
-        
-        $manuscripts->each(function ($manuscript) {
-            empty($manuscript->editorManuscript) ? null : $manuscript->delivery_at = date("d/m/Y", strtotime($manuscript->editorManuscript->delivery_at));
-            empty($manuscript->editorManuscript) ? null : $manuscript->time_response = date("d/m/Y", strtotime($manuscript->editorManuscript->created_at));
-        });
-
-        return array('data' => $manuscripts, 'col_header' => $col_header, 'col_db' => $col_db);
-
-    }
-
-// test ================================================================================================
-
-
-    public static function getDataInReview($user, $status) 
-    {
-        $permissions = explode(',', $user->actor_no);
-
-        $manuscripts = Manuscript::status($status)
-                                    ->with(['author' => function($query) use($user){
-                                        $query->select('id', 'last_name');
-                                    }])
-                                    ->with(['editor' => function($q){
-                                        $q->select('id', 'last_name');
-                                    }])
-                                    ->with(['editorManuscript' =>function($q){
-                                        $q->select('id','loop','delivery_at','decide', 'section_editor_decide');
-                                    }])
-                                    ;
-
-        if(in_array(CHIEF_EDITOR, $permissions)) 
-        {
-            $col_header = Constant::$in_review_chief_editor['col_header'];
-            $col        = Constant::$in_review_chief_editor['col'];  
-            $col_db     = Constant::$in_review_chief_editor['col_db'];
-
-            $manuscripts  = $manuscripts->selectColumns($col)
-                                    ->with(['seEditor' => function($q){
-                                        $q->select('id', 'last_name');
-                                    }])
-                                    ->get();
-            
-            $manuscripts->each(function ($manuscript) {
-                if($manuscript->editorManuscript)
-                {
-                    $manuscript->round_no_review = 'Bình luận vòng ' . $manuscript->editorManuscript->loop;
-                    empty($manuscript->editor->last_name) ? null : $manuscript->reviewer = $manuscript->editor->last_name;
-                }
-                
-                if($manuscript->author)
-                    $manuscript->last_name = $manuscript->author->last_name;
-
-                if($manuscript->seEditor)
-                    empty($manuscript->seEditor->last_name) ? null : $manuscript->section_editor = $manuscript->seEditor->last_name;
-
-                $manuscript->send_at = date("d/m/Y", strtotime($manuscript->send_at));
-                empty($manuscript->chief_decide) ? null : $manuscript->round_decide_chief_editor = Constant::$chief_decide[$manuscript->chief_decide];
-                empty($manuscript->is_chief_review) ? null : $manuscript->notify_chief_editor = Constant::$notify_chief_editor[$manuscript->is_chief_review];
-            });
-
-        } 
-        else if(in_array(SECTION_EDITOR, $permissions)) 
-        {
-
-            $col_header = Constant::$in_review_section_editor['col_header'];
-            $col        = Constant::$in_review_section_editor['col'];  
-            $col_db     = Constant::$in_review_section_editor['col_db'];
-
-            $manuscripts = $manuscripts->selectColumns($col)->get();
-                                
-            $manuscripts->each(function ($manuscript) {
-                if($manuscript->editorManuscript)
-                    $manuscript->round_no_review = 'Bình luận vòng ' . $manuscript->editorManuscript->loop;
-
-                if($manuscript->editor)
-                    empty($manuscript->editor->last_name) ? null : $manuscript->reviewer = $manuscript->editor->last_name;
-
-                if($manuscript->author)
-                    $manuscript->last_name = $manuscript->author->last_name;
-                
-                $manuscript->send_at = date("d/m/Y", strtotime($manuscript->send_at));
-                empty($manuscript->chief_decide) ? null : $manuscript->round_decide_chief_editor = Constant::$chief_decide[$manuscript->chief_decide];
-                empty($manuscript->is_chief_review) ? null : $manuscript->notify_chief_editor = Constant::$notify_chief_editor[$manuscript->is_chief_review];
-            });
-
-        } 
-        else if(in_array(MANAGING_EDITOR, $permissions)) 
-        {
-            $col_header = Constant::$in_review_manager_editor['col_header'];
-            $col        = Constant::$in_review_manager_editor['col'];  
-            $col_db     = Constant::$in_review_manager_editor['col_db'];
-
-            $manuscripts = $manuscripts->selectColumns($col)
-                                    ->with(['seEditor' => function($q){
-                                        $q->select('id', 'last_name');
-                                    }])
-                                    ->get();
-                                
-            $manuscripts->each(function ($manuscript) {
-                if($manuscript->editorManuscript)
-                    $manuscript->round_no_review = 'Bình luận vòng ' . $manuscript->editorManuscript->loop;
-
-                if($manuscript->editor)
-                    empty($manuscript->editor->last_name) ? null : $manuscript->reviewer = $manuscript->editor->last_name;
-                
-                if($manuscript->author)
-                    $manuscript->last_name = $manuscript->author->last_name;
-                if($manuscript->seEditor)
-                    empty($manuscript->seEditor->last_name) ? null : $manuscript->section_editor = $manuscript->seEditor->last_name;
-                
-                $manuscript->send_at = date("d/m/Y", strtotime($manuscript->send_at));
-                empty($manuscript->chief_decide) ? null : $manuscript->round_decide_chief_editor = Constant::$chief_decide[$manuscript->chief_decide];
-                empty($manuscript->is_chief_review) ? null : $manuscript->notify_chief_editor = Constant::$notify_chief_editor[$manuscript->is_chief_review];
-            });
-
-        } 
-        else if (in_array(AUTHOR, $permissions)) 
-        {
-            $col_header = Constant::$in_review_author['col_header'];
-            $col        = Constant::$in_review_author['col'];
-            $col_db     = Constant::$in_review_author['col_db'];
-
-            $manuscripts =  $manuscripts->selectColumns($col)
-                                    ->whereHas('author', function($q) use($user){
-                                        $q->where('id', $user->id);
-                                    })
-                                    ->get();
-
-            $manuscripts->each(function ($manuscript) {
-                // dd($manuscript);
-                if($manuscript->editorManuscript)
-                {
-                    $manuscript->round_no_review = 'Bình luận vòng ' . $manuscript->editorManuscript->loop;
-                    empty($manuscript->editorManuscript->decide) ? null : $manuscript->round_decide_editor = Constant::$editor_decide[$manuscript->editorManuscript->decide];
-                }
-                
-                if($manuscript->author)
-                    $manuscript->last_name = $manuscript->author->last_name;
-                
-                $manuscript->send_at = date("d/m/Y", strtotime($manuscript->send_at));
-            });
-        } 
-        else
-            abort(333);
-            // return array('data' => [], 'col_header' => [], 'col_db' => []);
-
-        // dd($manuscripts);
-
         return array('data' => $manuscripts, 'col_header' => $col_header, 'col_db' => $col_db);
     }
 
@@ -1293,38 +1102,6 @@ dd($stage);
         });
 
         // dd($manuscripts);
-        return array('data' => $manuscripts, 'col_header' => $col_header, 'col_db' => $col_db);
-    }
-
-    public static function getDataWaitReview($user, $status)
-    {   
-        $permissions = explode(',', $user->actor_no);
-
-        if(!in_array(REVIEWER, $permissions))
-            abort(333);
-            // return array('data' => [], 'col_header' => [], 'col_db' => []);
-
-        $col_header = Constant::$wait_review['col_header'];
-        $col        = Constant::$wait_review['col'];
-        $col_db     = Constant::$wait_review['col_db'];
-
-        $manuscripts = Manuscript::where('status', '=', $status)
-                                    ->where('editor_id', '=', $user->id)
-                                    ->with('author')
-                                    ->with(['editorManuscript' =>function($q){
-                                        $q->select('id','loop','delivery_at','decide', 'deadline_at');
-                                    }])
-                                    ->get();
-                                    
-        $manuscripts->each(function ($manuscript) {
-            if($manuscript->editorManuscript){
-                $manuscript->round_no_review = 'Vòng ' . $manuscript->editorManuscript->loop;
-                $manuscript->delivery_at = date("d/m/Y", strtotime($manuscript->editorManuscript->delivery_at));
-                $manuscript->deadline_at = date("d/m/Y", strtotime($manuscript->editorManuscript->deadline_at));
-                empty($manuscript->editorManuscript->decide) ? '-' : $manuscript->decide = Constant::$reviewer_decide[$manuscript->editorManuscript->decide];
-            }
-        });
-
         return array('data' => $manuscripts, 'col_header' => $col_header, 'col_db' => $col_db);
     }
 
@@ -1454,486 +1231,6 @@ dd($stage);
         return array('data' => $manuscripts, 'col_header' => $col_header, 'col_db' => $col_db);
     }
 
-    public function getDataReport($start, $end, $status)
-    {
-        $now = time();
-        $in_month = $now - 24*3600*30;   // default: 1 month
-        if(empty($start))
-        {
-            $start = date('d/m/Y', $in_month);
-            $obj_start = date_create_from_format("Y/m/d", date('Y/m/d', $in_month));
-        }
-        else
-        {
-            $obj_start = date_create_from_format("d/m/Y", Input::get('start'));
-        }
-
-        if(empty($end))
-        {
-            $end = date('d/m/Y', $now);
-            $obj_end = date_create_from_format("Y/m/d", date('Y/m/d', $now));
-        }
-        else
-        {
-            $obj_end = date_create_from_format("d/m/Y", Input::get('end'));
-        }
-
-        $permissions = explode(',', \Auth::user()->actor_no);
-
-        // dd($obj_start);
-        // dd($obj_end);
-        switch ($status) {
-            case REPORT_REJECTED:  //admin/report/rejected
-                $count_manu = $this->getDataReportRejected($obj_start, $obj_end, $permissions);
-
-                break;
-            
-            case REPORT_SUBMITED: //admin/report/submited
-                $count_manu = $this->getDataReportSubmited($obj_start, $obj_end, $permissions, SCREENING);
-
-                break;
-
-            case REPORT_PUBLISH_IN_YEAR: //admin/report/publish
-                $in_year = $now - 24*3600*365;    // 1 year
-
-                if(Input::get('start'))
-                {   
-                    $obj_start = date_create_from_format("d/m/Y", Input::get('start'));
-                }
-                else
-                {
-                    $start = date('d/m/Y', $in_year);
-                    $obj_start = date_create_from_format("Y/m/d", date('Y/m/d', $in_year));
-                }
-
-                $count_manu = $this->getDataReportPublishInYear($obj_start, $obj_end, $permissions, SCREENING);
-
-                break;
-
-            case REPORT_REVIEW_LOOP:  //admin/report/rejected
-                $count_manu = $this->getDataReportReviewLoop($obj_start, $obj_end, $permissions);
-
-                break;
-
-            case REPORT_WITHDRAWN:  //admin/report/withdraw
-                $count_manu = $this->getDataReportWithDrawn($obj_start, $obj_end, $permissions);
-
-                break;
-
-            case REPORT_RATIO_REJECT:  //admin/report/ratio_rejected
-                $count_manu = $this->getDataReportRatioRejected($obj_start, $obj_end, $permissions);
-
-                break;
-
-            case REPORT_PUBLISHED_DELINQUENT:  //admin/report/published_delinquent
-                $count_manu = $this->getDataJournalPublishedDelinquent($obj_start, $obj_end, $permissions);
-
-                break;
-
-            case REPORT_JOURNAL_IN_YEAR:  //admin/report/published_delinquent
-                $in_year = $now - 24*3600*365;    // 1 year
-
-                if(Input::get('start'))
-                {   
-                    $obj_start = date_create_from_format("d/m/Y", Input::get('start'));
-                }
-                else
-                {
-                    $start = date('d/m/Y', $in_year);
-                    $obj_start = date_create_from_format("Y/m/d", date('Y/m/d', $in_year));
-                }
-                $count_manu = $this->showJournalPublishInYear($obj_start, $obj_end, $permissions);
-
-                break;
-
-            case REPORT_REVIEW_TIME:  //admin/report/published_delinquent
-                // dump(date_create_from_format("d/m/Y", Input::get('end')));
-                // dump($start, $end, $obj_start, $obj_end);
-                $count_manu = $this->showReportReviewTime($obj_start, $obj_end, $permissions);
-
-                break;
-
-            default:
-                
-                break;
-        }
-        $data = ['start' => $start, 'end' => $end, 'count_manu' => $count_manu];
-
-        return $data;
-    }
-
-    public function whereHasUserId($query)
-    {
-        if(!$query)    
-
-            return null;
-
-        return $query = $query
-                    ->whereHas('author', function($q)
-                    {
-                        $q->orWhere('id', \Auth::user()->id);
-                    });
-    }
-
-    public function orWhereQuery($query, $field_name, $where_array)
-    {
-        if(!$query)    
-
-            return null;
-        // dd('dslajl');
-        return $query = $query->where(function($q) use($field_name, $where_array)
-                        {
-                            $total = count($where_array);
-                            if ($total > 0) 
-                            {
-                                $q = $q->where($field_name, $where_array[0]);
-                                for($i = 1; $i < $total; $i++){ 
-                                    $q = $q->orWhere($field_name, $where_array[$i]);
-                                }
-                            }
-                            // ($total > 0) ? $q = $q->where($field_name, $where_array[0]) : null;
-                        });
-    }
-
-    public function relationEditorManuscriptByStage($query, $stage)
-    {
-        $query = $query->whereHas('editorManuscripts', function($q) use($stage)
-        {
-            $q->where('stage', $stage);
-        });
-        
-        return $query;
-    }
-
-    public function whereBetweenDatetime($query, $field_name, $start_time, $end_time)
-    {
-        if(!$query)
-
-            return null;
-
-        return $query->where($field_name, '>=', $start_time)
-                    ->where($field_name, '<=', $end_time);
-    }
-
-    public function getCountRejectedManuscript($start, $end, $status = array(REJECTED), $stage = null)
-    {
-        $query = Manuscript::with('editorManuscripts');
-
-        // $count = DB::table('manuscripts');
-        if ($stage) {
-            $query = $this->relationEditorManuscriptByStage($query, $stage);
-        }
-
-        $query = $this->whereBetweenDatetime($query, 'updated_at', $start, $end );
-
-        $query = $this->orWhereQuery($query, 'status', $status);
-
-        return $query;
-    }
-
-    public function getCountWithdrawnManuscript($start, $end, $status = array(WITHDRAWN), $stage = null)
-    {
-        $query = Manuscript::with('editorManuscripts');
-
-        if($stage)
-           $query = $this->relationEditorManuscriptByStage($query, $stage);
-        
-        $query = $this->whereBetweenDatetime($query, 'updated_at', $start, $end );
-
-        $query = $this->orWhereQuery($query, 'status', $status);
-
-        return $query;
-    }
-
-    public function getCountSubmitedManuscript($start, $end)
-    {
-        $query = Manuscript::where('status', '<>', UNSUBMIT);
-        $query = $this->whereBetweenDatetime($query, 'created_at', $start, $end);
-        
-        return $query;
-    }
-
-    public function getDataReportRejected($start, $end, $permissions, $status = array(REJECTED))//array(REJECT, REVIEW_REJECT))
-    {
-        // Bản thảo bị từ chối
-        // Manuscript Table
-        // date_base = created_at  (between $start -> $end)
-        // status = REJECT
-        // user_id = $user->id (optional)
-
-        $count = $this->getCountRejectedManuscript($start, $end, $status, null);
-        
-        if(in_array(AUTHOR, $permissions) and $count != null)
-            $count = $this->whereHasUserId($count);
-
-        return ($count) ? $count->count() : '0';
-    }
-
-    public function getDataReportSubmited($start, $end, $permissions, $stage)
-    {
-        // Tổng số bản thảo đã gửi
-        // Mỗi bản thảo được tạo là 1 lần gửi, gửi nhiều lần 1 bản thảo vẫn chỉ là 1 lần gửi
-        // Manuscript Table
-        // date_base = created_at  (between $start -> $end)
-        // status != UNSUBMIT
-        // user_id = $user->id (optional)
-
-        $count = $this->getCountSubmitedManuscript($start, $end);
-
-        if(in_array(AUTHOR, $permissions) and $count != null)
-            $count = $this->whereHasUserId($count);
-
-        return ($count) ? $count->count() : '0';
-    }
-
-    public function getDataReportPublishInYear($start, $end, $permissions, $stage)
-    {   
-        // Số bản thảo xuất bản trong vòng 1 năm
-        // Manuscript Table
-        // status = PUBLISHED(Xuất bản)
-        // date_base = updated_at (between $start -> $end)
-        // user_id = $user->id (optional)
-
-        $count = Manuscript::whereStatus(PUBLISHED);
-        $count = $this->whereBetweenDatetime($count, 'updated_at', $start, $end);
-                        
-        if(in_array(AUTHOR, $permissions))
-            $count = $this->whereHasUserId($count);
-
-        return ($count) ? $count->count() : '0';
-    }
-
-    public function getDataReportReviewLoop($start, $end, $permissions)
-    {
-        // Số vòng phản biện bình quân
-        // Tổng Số vòng bình duyệt có phản biện / (Tổng Số bản thảo đang trong tiến trình bình duyệt + đã qua tiến trình bình duyệt)
-        $count_has_review = Manuscript::with('editorManuscripts')
-                        ->whereHas('editorManuscripts', function($q) use($start, $end)
-                        {
-                            $q->where('stage', REVIEWING)
-                                ->where('decide', REVIEW_ACCEPT);
-                            $q = $this->whereBetweenDatetime($q, 'created_at', $start, $end);
-                        });
-
-        $count_total = Manuscript::with('editorManuscript')
-                        ->whereHas('editorManuscript', function($q) use($start, $end)
-                        {
-                            $q = $this->orWhereQuery($q, 'stage', [PUBLISHING, EDITING, REVIEWING]);
-                            $q = $this->whereBetweenDatetime($q, 'created_at', $start, $end);
-                        });
-
-        if(in_array(AUTHOR, $permissions))
-        {
-            $count_has_review = $this->whereHasUserId($count_has_review);
-            $count_total = $this->whereHasUserId($count_total);
-        }
-
-        $total = ($count_total) ? $count_total->count() : 0 ;
-        $ratio = ($total > 0) ? $count_has_review->count()/$total : 0;
-
-        return (number_format($ratio, 3, '.', ''));
-    }
-
-    public function getDataReportWithDrawn($start, $end, $permissions)
-    {   
-        // Số bản thảo rút nộp
-        // Manuscript Table
-        // status = WITHDRAWN 
-        // date_base = updated_at (between $start -> $end)
-        // user_id = $user->id (optional)
-
-        $count = $this->getCountWithdrawnManuscript($start, $end);
-
-        if(in_array(AUTHOR, $permissions))
-            $count = $this->whereHasUserId($count);
-
-        return ($count) ? $count->count() : '0';
-    }
-
-    public function getDataReportRatioRejected($start, $end, $permissions)
-    {   
-        // Tỷ lệ từ chối vòng sơ loại = 
-        // Tổng bản thảo nhận bị “Từ chối” vòng sơ loại / (Tổng bản thảo gửi - Tổng bản thảo xin rút nộp vòng sơ loại)
-        // Tổng bản thảo nhận bị “Từ chối” vòng bình duyệt / (Tổng bản thảo gửi - Tổng bản thảo xin rút nộp vòng bình duyệt)
-
-        // Limit time: $start -> $end
-        // Tổng bản thảo gửi trong khoảng thời gian
-        // Tổng bản thảo nhận bị “Từ chối” vòng sơ loại 
-        // Tổng bản thảo nhận bị “Từ chối" vòng Bình duyệt 
-        // Tổng bản thảo xin rút nộp vòng sơ loại
-        // Tổng bản thảo xin rút nộp vòng bình duyệt
-
-        // Tổng bản thảo gửi trong khoảng thời gian
-        $total_submited = $this->getCountSubmitedManuscript($start, $end);
-
-        // Từ chối sơ loại
-        $rejected_screen = $this->getCountRejectedManuscript($start, $end, [REJECTED], [SCREENING]);
-
-        // Từ chối bình duyệt
-        $rejected_review = $this->getCountRejectedManuscript($start, $end, [REJECTED], [REVIEWING]);
-
-        // Tổng bản thảo xin rút nộp vòng bình duyệt
-        $withdrawn_review = $this->getCountWithdrawnManuscript($start, $end, [WITHDRAWN],[REVIEWING]);
-
-        // Tổng bản thảo xin rút nộp vòng bình duyệt
-        $withdrawn_screen = $this->getCountWithdrawnManuscript($start, $end, [WITHDRAWN],[SCREENING]);
-
-        if(in_array(AUTHOR, $permissions))
-        {
-            $total_submited = ($total_submited) ? $this->whereHasUserId($total_submited) : 0;
-            $rejected_review = ($rejected_review) ? $this->whereHasUserId($rejected_review) : 0;
-            $rejected_screen = ($rejected_screen) ? $this->whereHasUserId($rejected_screen) : 0;
-            $withdrawn_review = ($withdrawn_review) ? $this->whereHasUserId($withdrawn_review) : 0;
-            $withdrawn_screen = ($withdrawn_screen) ? $this->whereHasUserId($withdrawn_screen) : 0;
-        }
-
-        // number of manuscripts
-        $count_total = $total_submited->count();
-        $count_rejected_review = $rejected_review->count();
-        $count_rejected_screen = $rejected_screen->count();
-        $count_withdrawn_review = $withdrawn_review->count();
-        $count_withdrawn_screen = $withdrawn_screen->count();
-
-        // check null 
-        $actual_total_screen = ($count_total - $count_withdrawn_screen);
-        $actual_total_review = ($count_total - $count_withdrawn_review);
-        $actual_total = ($count_total - $count_withdrawn_review - $count_withdrawn_review);
-
-        $ratio_reject_review = ($actual_total_review == 0) ? 0 : ($count_rejected_review) / $actual_total_review;
-        $ratio_reject_screen = ($actual_total_screen == 0) ? 0 : ($count_rejected_review) / $actual_total_screen;
-        $ratio_total = ($actual_total == 0) ? 0 : ($count_rejected_screen + $count_rejected_review) / $actual_total;
-
-        // combine data
-        $arr_data = [
-                        'data'      => number_format($ratio_total, 3, '.', ''), 
-                        'screen'    => number_format($ratio_reject_screen, 3, '.', ''), 
-                        'review'    => number_format($ratio_reject_review, 3, '.', '')
-                    ];
-
-        return $arr_data;
-    }
-
-    public function getDataJournalPublishedDelinquent($start, $end)
-    {   
-        // Tổng số tạp chí xuất bản không đúng kỳ hạn theo năm
-        // Journal Table
-        // publish_at < expect_publish_at
-        // date_base = created_at (between $start -> $end)
-
-        $count = Journal::whereRaw(' (publish_at < expect_publish_at) ')
-                    ->where(function($q) use($start, $end){
-                        $q = $this->whereBetweenDatetime($q, 'updated_at', $start, $end);
-                    });
-
-        return $count->count();
-    }
-
-    public function showJournalPublishInYear($start, $end, $permissions)
-    {   
-        // Số tạp chí xuất bản trong năm
-        // Journal Table
-        // date_base = publish_at (between $start -> $end)
-
-        $count = Journal::where(function($q) use($start, $end){
-                        $q = $this->whereBetweenDatetime($q, 'publish_at', $start, $end);
-                    });
-        
-        return ($count) ? $count->count() : '0';
-    }
-
-    public function showReportReviewTime($start, $end, $permissions)
-    {   
-        // Thời gian phản biện bình quân
-        // Editor Manuscript Table
-        // stage = REVIEWING 
-        // date_base = updated_at (between $start -> $end)
-        // user_id = $user->id (optional)
-
-        $review_time = Manuscript::selectColumns('*')
-                        ->with('editorManuscripts')
-                        ->whereHas('editorManuscripts', function($q) use($start, $end)
-                        {
-                            $q->where('stage', REVIEWING);
-                            $q = $this->whereBetweenDatetime($q, 'created_at', $start, $end);
-                        })
-                        ->get();
-
-        $count = 0;
-        $total_time = 0;
-        foreach ($review_time as $value) {
-            foreach ($value->editorManuscripts as $editor_value) {
-                $count ++;
-                $total_time += strtotime($editor_value['deadline_at']) - strtotime($editor_value['delivery_at']);
-            }
-        }
-
-        $ratio = ($count != 0) ? $total_time / $count : 0;
-        $ratio = $ratio / (3600*24);
-        $ratio = number_format($ratio, 2, '.', '');
-
-        return $ratio;
-    }
-
-    public function getColumnTable($process, $actor, $reviewer_list = false)
-    {
-        return [
-            'data'             =>  $this->getDataTable($process, $actor, $reviewer_list),
-            'col_header'       =>  Constant::$tableColumns[$process][$actor]['col_header'],
-            'col_db'           =>  Constant::$tableColumns[$process][$actor]['col_result'],
-        ];
-    }
-
-    public function getDataTable($process, $actor, $reviewer_list = false)
-    {
-        $col = Constant::$tableColumns[$process][$actor]['col_select'];
-        $relate_cols = Constant::$tableColumns[$process][$actor]['col_relate'];
-        $relates = $this->getRelate($process, $actor);
-
-        $status = in_array($process, [WAIT_REVIEW, REVIEWED, REJECTED_REVIEW]) ? IN_REVIEW : $process;
-
-        $data = $this->model->status($status)
-                            ->actor($actor, $this->user->id, $reviewer_list)
-                            ->select($col)
-                            ->with($relates)->get();
-
-        $data = $this->mergeRelateCol($relate_cols, $data);
-
-        return $data;
-    }
-
-    public function mergeRelateCol($relate_cols, $data)
-    {
-        foreach ($data as $value) {
-            foreach ($relate_cols as $relate => $col) {
-                $property = $relate.'_'.$col;
-                $value->$property = is_object($value->$relate) ? $value->$relate->$col : '';
-            }
-        }
-
-        return $data;
-    }
-
-    public function getRelate($process, $actor)
-    {
-        $relates = Constant::$relateColSelect[$process][$actor];
-
-        $result = array();
-        foreach ($relates as $key => $value) {
-            if ($key == 'editorManuscript' && $this->hasPermission(REVIEWER)) {
-                $result[$key] = function($query) use ($value) {
-                    $query->select($value)->where('user_id', $this->user->id);
-                };
-            } else {
-                $result[$key] = function($query) use ($value) {
-                    $query->select($value);
-                };
-            }
-        }
-
-        return $result;
-    }
-
-
     public function uploadFile(){
         if(doUploadDocument()){
 
@@ -1942,40 +1239,18 @@ dd($stage);
 
         return '';
     }
-
-    public function uploadFileEditor($manu_id, $user_id, $file_type, $new_key_manu_id = null, $is_new = COPY_MANUSCRIPT_FILE){
+    
+    public function uploadFileEditor($manu_id, $user_id, $file_type, $total_page = 0){
+        $new_manu = $this->createNewManuscriptFile($manu_id, $user_id, $file_type, $total_page);
+        $new_manu->save();
         
-
-        $new_key_manu_file_id = null;
-
-        if($is_new == NEW_MANUSCRIPT_FILE)
-        {
-            // dd($manu_id, $user_id, $file_type, $new_key_manu_id , $is_new);
-            // dump('NEW_MANUSCRIPT_FILE');
-            // nếu là tạo mới manuscript file
-            $new_manu = $this->createNewManuscriptFile($manu_id, $user_id, $file_type, NEW_MANUSCRIPT_FILE);
-            $manu_id = $new_manu->manuscript_id;
-            $new_key_manu_file_id = $new_manu->id;
-        }
-        else
-        {
-            // dd('COPY_MANUSCRIPT_FILE');
-            // dump('COPY_MANUSCRIPT_FILE');
-            // old file
-            $new_manu = $this->createNewManuscriptFile($manu_id, $user_id, $file_type, COPY_MANUSCRIPT_FILE);
-
-            // check null
-            
-        }
-
         if(!$_FILES)
 
             return false;
 
         if(doUploadDocument()){
-
             // Update Manuscript files with file type
-            $this->saveManuscriptFiles($manu_id, $user_id, $new_key_manu_id, $file_type, $new_key_manu_file_id);
+            $this->saveManuscriptFiles($manu_id, $user_id, $file_type);
 
             //return path file if ok
             return $_FILES["file"]["name"] . '/' . basename($_FILES["file"]["name"]);
@@ -1988,8 +1263,6 @@ dd($stage);
     {
         // Get full path in ManuscriptFiles table
         $manuFiles = ManuscriptFile::find($manu_file_id);
-
-        // dd($manuFiles);
         
         $file_path = $manuFiles ? $manuFiles->name : '';
         
@@ -1999,38 +1272,17 @@ dd($stage);
         return true;
     }
 
-    public function createNewManuscriptFile($manu_id, $user_id, $file_type, $is_new)
+    public function createNewManuscriptFile($manu_id, $user_id, $file_type, $total_page = 0)
     {
-        if($is_new == NEW_MANUSCRIPT_FILE)
-        {
-            $this->newManuscriptFile($manu_id, $user_id, $file_type);
-        }
-        else
-        {
-            $manu_file = new ManuscriptFile;
-            $old_manu = ManuscriptFile::where('manuscript_id', $manu_id)
-                                    ->where('user_id', $user_id)
-                                    ->first();
-            if(!$old_manu)
-            {
-                return $this->newManuscriptFile($manu_id, $user_id, $file_type);
-            }
-            $manu_file->fill($old_manu->toArray());
-            $manu_file->type = $file_type;
-            $manu_file->save();
-        }
-         
-        return $manu_file;
-    }
+    	$manu_file = new ManuscriptFile;
 
-    public function newManuscriptFile($manu_id, $user_id, $file_type)
-    {
-        $manu_file = new ManuscriptFile;
-        $manu_file->manuscript_id = $manu_id;
-        $manu_file->user_id = $user_id;
+    	$manu_file->manuscript_id = $manu_id;
+    	$manu_file->user_id = $user_id;
         $manu_file->type = $file_type;
-        $manu_file->save();
-
+        $manu_file->total_page = $total_page;
+        
+        // $manu_file->save();
+        
         return $manu_file;
     }
 
@@ -2041,5 +1293,121 @@ dd($stage);
         $manuscripts->keyword_en = explode(',', $manuscripts->keyword_en);
 
         return $manuscripts;
+    }
+
+    public function getDataCombobox($field, $value, $key_field_name, $value_field_name)
+	{
+		$temp = Keyword::where($field, '=', $value)->get();
+
+		$id_arr = $temp->lists($key_field_name);
+		$values_arr = $temp->lists($value_field_name);
+
+		return array_combine($id_arr, $values_arr);
+	}
+
+	public function getDataComboboxSelected($id, $lang_code)
+	{
+		$temp = KeywordManuscript::where('manuscript_id', '=', $id)
+								->with('keyword')
+								->whereHas('keyword', function($q) use($lang_code)
+								{
+									$q->where('lang_code', $lang_code);
+								})
+								->get()
+								->lists('keyword_id');
+                                
+		return $temp;
+	}
+
+    public function checkIsAuthor()
+    {
+        if(!$this->hasPermission(AUTHOR))
+        {
+            abort(333);
+        }
+    }
+
+    public function getDataKeyword()
+    {
+        $keyword_en = $this->getDataCombobox('lang_code', EN , 'id', 'text');
+        $keyword_vi = $this->getDataCombobox('lang_code', VI, 'id', 'text');
+
+        // $temp = Keyword::all();
+        // dd($temp);
+
+        return array('keyword_en'   =>  $keyword_en, 'keyword_vi'    =>  $keyword_vi);
+    }
+
+    public function getDataFormEditManuscript($id, $manuscripts)
+    {
+        $keyword_en_selected = null;
+        $keyword_vi_selected = null;
+        $disabled = false;      // edit or disable control
+        $is_new = true;         // new or edit manuscript 
+        $need_edit = false;     // need edit again ?
+        $is_withdrawn = false;  // withdrawn ?
+
+        // if user hasn't permission
+        ($this->user->id != $manuscripts->author_id) ? abort(333) : '' ;
+
+        // Get data for keyword combobox 
+        $manuscripts = $this->restoreStatusListbox($manuscripts);
+        $keyword_en_selected = $this->getDataComboboxSelected($id, EN);
+        $keyword_vi_selected = $this->getDataComboboxSelected($id, VI);
+
+        if($manuscripts) 
+        {
+            $is_new = false;
+            ($manuscripts->status == WITHDRAWN) ? $is_withdrawn = true : '';
+            ($manuscripts->status == IN_SCREENING_EDIT || $manuscripts->status == IN_REVIEW_EDIT) ? $need_edit = true : '';
+        } 
+        else
+        {
+            $manuscripts = $this;
+        }
+        
+        $disabled = $this->checkDisabledEditManuscript($manuscripts);
+
+        return array('keyword_en_selected'  =>  $keyword_en_selected, 
+                    'keyword_vi_selected'   =>  $keyword_vi_selected, 
+                    'need_edit'             =>  $need_edit,
+                    'is_withdrawn'          =>  $is_withdrawn,
+                    'is_new'                =>  $is_new,
+                    'disabled'              =>  $disabled,
+                    'manuscripts'           =>  $manuscripts,
+                    );
+    }
+
+    public function getDataFormNewManuscript($manuscripts)
+    {
+
+        return array('keyword_en_selected'  =>  null, 
+                    'keyword_vi_selected'   =>  null, 
+                    'need_edit'             =>  false,
+                    'is_withdrawn'          =>  false,
+                    'is_new'                =>  true,
+                    'disabled'              =>  false,
+                    'manuscripts'           =>  $manuscripts,
+                    );
+    }
+
+    public function getDataRefuse()
+    {
+        $permission = $this->getPermission();
+        $result_screening = $this->getColumnTable(IN_SCREENING_REFUSE, $permission);
+        $result_reviewing = $this->getColumnTable(IN_REVIEW_REFUSE, $permission);
+        $result_screening['data'] = $result_reviewing['data']->merge($result_screening['data']);
+
+        return $result_screening;
+    }
+
+    public function getListKeywords($field, $value, $key_field_name, $value_field_name)
+    {
+        $temp = Keyword::where($field, $value)->get();
+
+        $id_arr = $temp->lists($key_field_name);
+        $values_arr = $temp->lists($value_field_name);
+
+        return array_combine($id_arr, $values_arr);
     }
 }

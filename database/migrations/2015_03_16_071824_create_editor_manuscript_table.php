@@ -20,7 +20,7 @@ class CreateEditorManuscriptTable extends Migration {
 			$table->integer('manuscript_id');
 			$table->integer('user_id');
 			$table->integer('loop');
-			$table->text('comments');
+			$table->text('comments')->nullable();;
 			$table->tinyInteger('decide')->nullable();
 			$table->tinyInteger('section_editor_decide')->nullable();
 			$table->integer('editor_suggested_id')->nullable();

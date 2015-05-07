@@ -13,7 +13,7 @@ class ComposerServiceProvider extends ServiceProvider {
     public function boot()
     {
         // Using class based composers...
-        View::composer(['manuscripts.*', 'users.*', 'dashboard.*'], 'App\Http\ViewComposers\UserComposer');
+        View::composer(['manuscripts.*', 'users.*', 'dashboard.*', 'journals.*'], 'App\Http\ViewComposers\UserComposer');
     }
 
     /**

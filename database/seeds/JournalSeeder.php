@@ -22,7 +22,7 @@ class JournalSeeder extends Seeder
                 'name' => 'Journal '. $i,
                 'num' => $i,
                 'cover' => $faker->randomElement($cover),
-                'publish_at' => $faker->randomElement($publish_at),
+                'expect_publish_at' => $faker->randomElement($publish_at),
             ];
         }
 

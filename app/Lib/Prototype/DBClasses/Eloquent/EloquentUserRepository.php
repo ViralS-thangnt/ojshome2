@@ -19,15 +19,17 @@ class EloquentUserRepository extends AbstractEloquentRepository implements UserI
 
     public function formModify($data, $id = null)
     {
+
         if ($id) {
             $user = $this->model->find($id);
+            $this->checkEmail($user);
         } else {
             $user = $this->model;
         }
 
-        if ($data['actor_no']) {
-            $data['actor_no'] = implode(',', $data['actor_no']);
-        }
+        // if ($data['actor_no']) {
+        //     $data['actor_no'] = implode(',', $data['actor_no']);
+        // }
 
         $data['password'] = bcrypt($data['password']);
 
@@ -35,6 +37,11 @@ class EloquentUserRepository extends AbstractEloquentRepository implements UserI
         $user->save();
 
         return $user;
+    }
+
+    public function checkEmail($user)
+    {
+        
     }
 
     public function getListIds($actor, $none_value = false)
@@ -70,6 +77,21 @@ class EloquentUserRepository extends AbstractEloquentRepository implements UserI
         }
 
         return null;
+    }
+
+    public function deleteUser($id)
+    {
+        // if(in_array(ADMIN, explode(',', $this->user->actor_no)))
+        if(strpos($this->user->actor_no, (string)ADMIN) >= 0)
+        {
+            $this->user->withTrashed()->where('id', $id)->delete();
+            Session::flash(SUCCESS_MESSAGE, 'Delete user successfully');
+        }
+        else
+        {
+
+            return view('manuscripts.permission_denied')->withMessage('You can not access this site');
+        }
     }
 
 }

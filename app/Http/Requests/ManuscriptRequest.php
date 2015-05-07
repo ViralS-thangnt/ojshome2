@@ -27,6 +27,15 @@ class ManuscriptRequest extends Request {
 		$keyword_en = empty(Input::get('keyword_en')) ? null : implode(',', Input::get('keyword_en')); 
 		$type = empty(Input::get('type')) ? null : implode(',', Input::get('type'));
 		Input::merge(['keyword_vi' => $keyword_vi, 'keyword_en' => $keyword_en, 'type' => $type, 'send_at' => new DateTime]);
+		// [-\w]+(?:\W+[-\w\)\*]+){0,19}\W*
+		// ^[-\w]+(?:\W+[-\w]+){9,14}\W*$
+		
+		if(Input::get('status') == DRAFT_MANUSCRIPT)
+		{
+			// save draft
+
+			return [];
+		}
 
 		return [
 			'type'					=> 'required', 

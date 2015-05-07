@@ -16,20 +16,28 @@
     
 @stop
 
-<!-- Page Title Extra -->
-@section('title-extra')
-
-<!-- More extra - Page Title  -->
-
-@stop
-
-<!-- Left column -->
-@section('left-column')
-{!! getMenuItem($permissions) !!} 
-@stop
-
 @section('content')
-    
+<form method="POST" id="form-delete">
+    <input type="hidden" name="_method" value="DELETE" />
+    <input type="hidden" name="_token" value="{{ csrf_token() }}" />
+</form>
+
+<script type="text/javascript">
+
+    $(document).ready(function(){
+        $('.delete').click(function(){
+
+            if (confirm('Are you sure you want to delete this journal ?')) {
+                $('#form-delete').attr('action', $(this).attr('href')).submit(); 
+
+                return true;   
+            }
+
+            return false;
+        });
+    });
+</script>
+
 <script type="text/javascript">
     $(function() {
         $('#table_data').dataTable({
@@ -55,8 +63,7 @@
                 @foreach($journals['col_header'] as $head)
                      <th class="sorting_asc center" role="columnheader" tabindex="0" aria-controls="table_data" rowspan="1" colspan="1">{{trans($head)}}</th>
                 @endforeach
-                <th rowspan="1" colspan="1" class="center">{!! trans('admin.edit') !!}</th>
-                <th rowspan="1" colspan="1" class="center">{!! trans('admin.delete') !!}</th>
+                <th rowspan="1" colspan="3" class="center">Operations</th>
             </tr>
         </thead>
 
@@ -65,8 +72,10 @@
                 @foreach($journals['col_header'] as $head)
                      <th class="sorting_asc center" role="columnheader" tabindex="0" aria-controls="table_data" rowspan="1" colspan="1">{{trans($head)}}</th>
                 @endforeach
-               <th rowspan="1" colspan="1" class="center">{!! trans('admin.edit') !!}</th>
+                <th rowspan="1" colspan="1" class="center">{!! trans('admin.edit') !!}</th>
                 <th rowspan="1" colspan="1" class="center">{!! trans('admin.delete') !!}</th>
+                <th rowspan="1" colspan="1" class="center">{!! trans('admin.detail') !!}</th>
+
             </tr>
         </tfoot>
         <tbody role="alert" aria-live="polite" aria-relevant="all">
@@ -79,9 +88,10 @@
                             <td class="center" > {!! empty($row->$col) ? '-' : $row->$col !!} </td>
                     @endforeach
                     
-               {{--      <td class="center"><a href = "{{ url(Constant::$author_per['admin.manuscript.create'] . '/' . $row->id) }}"> {!! Lang::get('admin.manuscript.more_detail') !!} </a></td> --}}
+               
                     <td class="center"><a href ="{!! url('admin/journal/form/'. $row->id) !!}">{!! trans('admin.edit') !!}</a></td>
-                    <td class="center"><a href ="{!!url('admin/journal/'. $row->id) !!}" class="delete">{!! trans('admin.delete') !!}</a></td>
+                    <td class="center"><a href ="{!! url('admin/journal/destroy/'. $row->id) !!}" class="delete">{!! trans('admin.delete') !!}</a></td>
+                    <td class="center"><a href ="{!! url('admin/journal/'.$row->id.'/detail') !!}">{!! trans('admin.detail') !!}</a></td>
                 </tr>
 
             @endforeach
@@ -93,20 +103,7 @@
 
 </div><!-- /.box-body -->
 </div>
-<form method="post" id="form-delete">
-<input type="hidden" name="_method" value="DELETE" />
-<input type="hidden" name="_token" value="{{ csrf_token() }}" />
-</form>
-<script type="text/javascript">
-    $(document).ready(function(){
-        $('a.delete').click(function(){
-            if (confirm('Are you sure you want to delete this user ?')) {
-                $('#form-delete').attr('action', $(this).attr('href')).submit();    
-            }
 
-            return false;
-        });
-    })
-</script>
+
 
 @stop

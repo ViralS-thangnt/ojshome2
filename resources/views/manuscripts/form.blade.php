@@ -20,12 +20,14 @@
 @section('content')
 
 
+
 <!-- form start -->  
 @if($is_new and !$is_withdrawn)
 {!! Form::model($manuscripts, ['method' => 'POST', 'route' => 'manuscript.insert', 'enctype' => 'multipart/form-data', 'id' => 'form-manuscript'] ) !!}
 @else
 {!! Form::model($manuscripts, ['method' => 'POST', 'route' => ['manuscript.update', $id], 'enctype' => 'multipart/form-data', 'id' => 'form-manuscript'] ) !!}
 @endif
+
 <!-- <div class="box box-primary"> -->
 <div class="box box-primary padding-box">	
 

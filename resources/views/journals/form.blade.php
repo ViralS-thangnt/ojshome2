@@ -25,23 +25,23 @@
 @section('content')
 
 <!-- form start -->   
-{!! Form::model($journal, ['route' => ['journal.update', $id], 'enctype' => 'multipart/form-data', 'id' => 'form-manuscript'] ) !!}
+{!! Form::model($journal, ['route' => ['journal.update', $id], 'files' => true, 'id' => 'form-manuscript'] ) !!}
 
 <!-- <div class="box box-primary"> -->
-{!! Form::div_open('box box-primary padding-box') !!}
+<div class="box box-primary padding-box">	
 	
 	<!-- box-header -->
-	{!! Form::div_open('box-header') !!}
+	<div class="box-header">	
 		{!! Form::h_custom(3, Lang::get('admin.journal.create.detail.header'), 'box-title') !!}
-	{!! Form::div_close() !!}<!-- /.box-header -->
+	</div><!-- /.box-header -->
 	
 	
-	{!! Form::div_open('box-body') !!}
+	<div class="box-body">	
 	
 		{!! ErrorDisplay::getInstance()->DisplayAll($errors) !!}
 
 
-		{!! Form::div_open('form-group') !!}
+		<div class="form-group">
 			{!! Form::label_custom(Lang::get('admin.journal.create.name'), 'text-form-large', true)!!}
 
 			{!! Form::help_block(Lang::get('admin.journal.create.help.name')) !!}
@@ -49,11 +49,11 @@
 			{!! Form::textarea_custom('name', null, 3, Lang::get('admin.journal.create.placeholder.name'), 'form-control',
 							['onkeyup' => 'countWords(this, 20, 2, "black", "red", "countTopicName")'] ) !!}
 
-			{!! Form::div_open('', 'countTopicName') !!}{!! Form::div_close() !!}
+			<div id="countTopicName"></div>
 			
-		{!! Form::div_close() !!}
+		</div>
 
-		{!! Form::div_open('form-group') !!}
+		<div class="form-group">
 			{!! Form::label_custom(Lang::get('admin.journal.create.num'), 'text-form-large', true)!!}
 
 			{!! Form::help_block(Lang::get('admin.journal.create.help.num')) !!}
@@ -61,13 +61,13 @@
 			{!! Form::textarea_custom('num', null, 2, Lang::get('admin.journal.create.placeholder.num'), 'form-control',
 							['onkeyup' => 'countWords(this, 200, 1, "black", "red", "countSummaryVn")'] ) !!}
 			
-			{!! Form::div_open('', 'countSummaryVn') !!}{!! Form::div_close() !!}
+			<div id="countSummaryVn"></div>
 
-		{!! Form::div_close() !!}
+		</div>
 
-		{!! Form::div_open('form-group') !!}
+		<div class="form-group">
 
-			{!! Form::label_custom(Lang::get('admin.journal.create.publish'), 'text-form-large', true)!!}
+			{!! Form::label_custom(Lang::get('admin.journal.create.expect_publish'), 'text-form-large')!!}
 
 			{!! Form::help_block(Lang::get('admin.journal.create.help.publish')) !!}
 
@@ -78,11 +78,11 @@
 				{!!Form::text('publish_at','',['class' => 'datepicker']) !!}
 			@endif
 			 
-		{!! Form::div_close() !!}
+		</div>
 
-		{!! Form::div_open('form-group') !!}
+		<div class="form-group">
 
-			{!! Form::label_custom(Lang::get('admin.journal.create.expect_publish'), 'text-form-large')!!}
+			{!! Form::label_custom(Lang::get('admin.journal.create.publish'), 'text-form-large', true)!!}
 
 			{!! Form::help_block(Lang::get('admin.journal.create.help.expect_publish')) !!}
 			
@@ -95,39 +95,43 @@
 
 			@endif
 			 
-		{!! Form::div_close() !!}
-         
+		</div>
 
-	{!! Form::div_close() !!}<!-- end .box-body -->
+	</div><!-- end .box-body -->
 	
-{!! Form::div_close() !!}<!-- /.box box-primary -->
+</div><!-- /.box box-primary -->
 
 
 <!-- Upload file -->
-{!! Form::div_open('box box-primary') !!}
+<div class="box box-primary">	
 	<!-- box-header -->
-	{!! Form::div_open('box-header padding-box') !!}
+	<div class="box-header padding-box">	
 		{!! Form::label_custom(Lang::get('admin.journal.create.upload.header'), 'text-form-large')!!}
-	{!! Form::div_close() !!}<!-- /.box-header -->	
+	</div><!-- /.box-header -->	
 
 	
 	<!-- box-body -->
-	{!! Form::div_open('box-body') !!}
+	<div class="box-header">
 
-		{!! Form::div_open('form-group') !!}
+		<div class="form-group">
 	
+		
 		@if(isset($journal->cover) && ($journal->cover)!="")
+			<input type="hidden" id="imgUrl" name="imgUrl" value="{!! url('/images/'.$journal->cover) !!}" alt="cover image"/>
+		@else
+			<input type="hidden" id="imgUrl" name="imgUrl" value="" alt="cover image" />
+		@endif	 
 
-			<img src="{!! url('/images/'.$journal->cover) !!}" height="150" width="200">
+		
+		<img name="imgCover" id="imgCover"/>
+		<p></p>
 
-		@endif	
-			{!! Form::file('cover') !!}
+		<input type="file" id="cover" name="cover"/>
+		</div>
 
-		{!! Form::div_close() !!}
+	</div>
 
-	{!! Form::div_close() !!}
-
-{!! Form::div_close() !!}<!-- /.box box-primary -->
+</div><!-- /.box box-primary -->
 
 	
 <!-- Submit	 -->
@@ -140,8 +144,33 @@
     $('.datepicker').datepicker({
     	format: "yyyy/mm/dd",
     });
-       
+    
+	$(document).ready(function(){
+
+		document.getElementById("imgCover").src = document.getElementById("imgUrl").value;
+
+		$("#cover").change(function(){
+	    	readURL(this);
+		});
+
+	});      
+
+	function readURL(input) {
+
+	    if (input.files && input.files[0]) {
+	        var reader = new FileReader();
+
+	        reader.onload = function (e) {
+	            $('#imgCover').attr('src', e.target.result);
+	        }
+
+	        reader.readAsDataURL(input.files[0]);
+	    }
+	}
+
 </script>
+
+
 
 @stop
 

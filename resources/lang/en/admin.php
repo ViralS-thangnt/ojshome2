@@ -14,7 +14,8 @@ return [
 	'manuscript.rejected' 		=>	'Rejected Manuscript',
 	'manuscript.withdrawn' 		=>	'Withdrawn Manuscript',
 	'manuscript.published' 		=>	'Published Manuscript',
-	'admin.manuscript.all'		=>	'All Manuscripts',
+	'manuscript.all'			=>	'All Manuscripts',
+	'manuscript.delete'			=>	'Delete Manuscript',
 
 	//review
 	'manuscript.waitReview'     =>  'Manuscript Waiting For Review',
@@ -29,7 +30,7 @@ return [
 	'edit'						=>	'Edit',
 	'delete'					=>	'Delete',
 	'emptyData'					=>	'No match record found',
-	'detail'					=>   'Detail',
+	'detail'					=>  'Detail',
 
 	//message
 	'FailedLoginMessage'		=>	'These credentials do not match our records.',
@@ -89,8 +90,8 @@ return [
 	// manuscript - In review
 	'manuscript_in_review.title'		=>	"English Thông tin các bản thảo đang bình duyệt",
 	// validate - manuscript
-	'summary_vi.regex'			=>	'English Từ khoá Tiếng Việt chỉ được nhập từ 150 - 200 từ',
-	'summary_en.regex'			=>	'English Từ khoá Tiếng Anh chỉ được nhập từ 150 - 200 từ ',
+	'summary_vi.regex'			=>	'English Tóm tắt Tiếng Việt chỉ được nhập từ 150 - 200 từ',
+	'summary_en.regex'			=>	'English Tóm tắt Tiếng Anh chỉ được nhập từ 150 - 200 từ ',
 	'name.regex'				=>	'English Tên chỉ được nhập từ 1 - 20 từ',
 	'file.required'				=>	'English Bạn chưa chọn file upload',
 	'expect_journal_id.numeric'	=>	'English Số mong muốn xuất bản phải có định dạng số',
@@ -110,7 +111,7 @@ return [
 	'upload.file_too_large'		=>	'English Sorry, your file is too large.',
 	'upload.file_uploaded'		=>	'English The file :filename has been uploaded.',
 	'upload.file_not_uploaded'	=>	'English Sorry, your file was not uploaded.',
-	'upload.error_unknow'		=>	'English Từ khoá Tiếng Việt phải chọn tối thiểu 3 từ khoá',
+	'upload.error_unknow'		=>	'English Error Unknow',
 	// Column header - Blade templateEnglish 
 	'id'						=>  'English ID', 
 	'send_at'					=>  'English Ngày gửi', 
@@ -137,6 +138,12 @@ return [
 	//journal
 	'jounal.create'						=> 'Create New Journal',
 	'jounal.all'						=> 'List Journals',
+
+	'jounal.all'						=> 'List Journals',
+	'jounal.all'						=> 'List Journals',
+	
+	
+
 	'journal.title' 					=> 'English Tạp chí',
 	'journal.journal_info'				=> 'English Thông tin tạp chí',
 	'journal.create.detail.header'		=> 'English Chi tiết',
@@ -203,9 +210,6 @@ return [
 	'report.inner.journal_number'			=>	'Số tạp chí',
 
 
-
-
-
 	//button
 	'rejected'	=>	'Rejected',
 	'withdrawn'	=>	'English Rút nộp',
@@ -215,5 +219,43 @@ return [
 	'reviewed.reviewers.list' => 'Reviewed Reviewers List',
 	'reject.reviewers.list' => 'Rejected Reviewers List',
 	'invite.reviewers.list' => 'Invite Reviewer List',
+
+	// User register 
+	'user.register.username.required'	=>	'Bạn cần phải nhập Name',
+	'user.register.username.max'		=>	'Name chỉ được nhập tối đa 40 ký tự',
+	'user.register.username.regex'		=>	'Name không thể chứa các ký tự đặc biệt',
+
+	'user.register.password.required'	=>	'Bạn cần phải nhập mật khẩu',
+	'user.register.password.min'		=>	'Mật khẩu phải nhập ít nhất 8 ký tự',
+	'user.register.password.max'		=>	'Mật khẩu chỉ được nhập tối đa 32 ký tự',
+	'user.register.password.confirmed'	=>	'Xác nhận mật khẩu chưa đúng',
+
+	'user.register.last_name.required'	=>	'Bạn cần phải nhập Last Name',
+	'user.register.last_name.max'		=>	'Last Name chỉ được nhập tối đa 40 ký tự',
+	'user.register.last_name.regex'		=>	'Last Name không thể chứa các ký tự đặc biệt',
+
+	'user.register.first_name.required'	=>	'Bạn cần phải nhập First Name',
+	'user.register.first_name.max'		=>	'First Name chỉ được nhập tối đa 40 ký tự',
+	'user.register.first_name.regex'	=>	'First Name không thể chứa các ký tự đặc biệt',
+
+	'user.register.middle_name.regex'	=>	'Middle Name không thể chứa các ký tự đặc biệt',
+
+	'user.register.email.required'		=>	'Bạn cần phải nhập Email',
+	'user.register.email.email'			=>	'Định dạng Email không đúng',
+	'user.register.email.unique'		=>	'Email đã tồn tại. Bạn hãy chọn email khác',
+
+	'user.register.actor_no.required'	=>	'Bạn cần phải chọn vai trò của tài khoản này',
+
+	'user.register.year.required'		=>	'Bạn cần phải nhập Year',
+	'user.register.year.date_format'	=>	'Bạn nhập không đúng định dạng năm',
+
+	'user.register.phone.regex'			=>	'Bạn nhập sai định dạng của Phone ',
+
+	'user.register.address.regex'		=>	'Address không thể chứa các ký tự đặc biệt',
+	'user.register.nation.regex'		=>	'Nation không thể chứa các ký tự đặc biệt',
+	'user.register.research_area.regex'	=>	'Research Area không thể chứa các ký tự đặc biệt',
+	'user.register.research.regex'		=>	'Research không thể chứa các ký tự đặc biệt',
+
+
 ];
 
